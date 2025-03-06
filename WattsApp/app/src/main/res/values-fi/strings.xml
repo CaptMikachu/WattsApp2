@@ -45,4 +45,7 @@
     <string name="textfield_label_name_2">Nimi</string>
     <string name="save_button">Tallenna</string>
     <string name="title_user_page">Käyttäjä</string>
+    <string name="take_pic_button">Uusi Profiilikuva</string>
+    <string name="delete_pic_button">Poista Kuva</string>
+    <string name="update_pic_button">Päivitä Kuva</string>
 </resources>

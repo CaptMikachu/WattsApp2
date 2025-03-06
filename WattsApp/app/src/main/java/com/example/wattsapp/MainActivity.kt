@@ -87,6 +87,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import java.io.File
+
+
 const val BASE_URL = "https://api.porssisahko.net/"
 const val LATEST_PRICES_ENDPOINT = "v1/latest-prices.json"
 const val API_MAIN_PAGE_URL = "https://www.porssisahko.net/api"
@@ -970,6 +991,55 @@ fun Page3() {
 fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
     var localUserName by remember { mutableStateOf(userName) }
     var errorMessage by remember { mutableStateOf("") }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+    var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraPermissionGranted = remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+    var recomposeTrigger by remember { mutableStateOf(false) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            tempCameraUri?.let { uri ->
+                imageUri = uri  // Only set imageUri on success
+                sharedPreferences.edit().putString("image_uri", uri.toString()).apply()
+            }
+        }
+        // Clear temp URI whether successful or not
+        tempCameraUri = null
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        cameraPermissionGranted.value = isGranted
+    }
+
+    LaunchedEffect(Unit, recomposeTrigger) {
+        if (!cameraPermissionGranted.value) {
+            permissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+        val savedUri = sharedPreferences.getString("image_uri", null)
+        if (savedUri != null) {
+            imageUri = Uri.parse(savedUri)
+        }
+    }
+
+    LaunchedEffect(imageUri) {
+        imageUri?.let { uri ->
+            sharedPreferences.edit().putString("image_uri", uri.toString()).apply()
+        }
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -984,7 +1054,7 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
                     modifier = Modifier.padding(16.dp)
                 )
                 Button(onClick = {
-                    onUserNameChange("") // Delete the user name
+                    onUserNameChange("")
                 }) {
                     Text(stringResource(R.string.delete_user_name))
                 }
@@ -1001,7 +1071,7 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
                             localUserName = newValue
                             errorMessage = ""
                         } else {
-                            errorMessage = "Username cannot exceed 10 characters"
+                            errorMessage = "Username cannot exceed 16 characters"
                         }
                     },
                     label = { Text(stringResource(R.string.name)) }
@@ -1027,7 +1097,7 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
                             localUserName = newValue
                             errorMessage = ""
                         } else {
-                            errorMessage = "Username cannot exceed 10 characters"
+                            errorMessage = "Username cannot exceed 16 characters"
                         }
                     },
                     label = { Text(stringResource(R.string.textfield_label_name_2)) }
@@ -1043,11 +1113,70 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
             Spacer(modifier = Modifier.padding(16.dp))
             Button(onClick = {
                 if (localUserName.length <= 16) {
-                    onUserNameChange(localUserName) // Save the user name
+                    onUserNameChange(localUserName)
                 }
             }) {
                 Text(stringResource(R.string.save_button))
             }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                imageUri = null  // Reset imageUri to prevent flashing
+                val photoFile = File(context.filesDir, "photo.jpg")
+                val photoUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.provider",
+                    photoFile
+                )
+                tempCameraUri = photoUri  // Store URI temporarily
+                cameraLauncher.launch(photoUri)
+            }) {
+                Text(stringResource(R.string.take_pic_button))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        item {
+            Box(
+                modifier = Modifier
+                    .size(150.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+            ) {
+                imageUri?.let { uri ->
+                    val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .rotate(90f),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                recomposeTrigger = !recomposeTrigger
+            }) {
+                Text(stringResource(R.string.update_pic_button))
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                imageUri = null
+                sharedPreferences.edit().remove("image_uri").apply()
+            }) {
+                Text(stringResource(R.string.delete_pic_button))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

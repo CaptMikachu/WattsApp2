@@ -44,4 +44,7 @@
     <string name="textfield_label_name_2">Name</string>
     <string name="save_button">Save</string>
     <string name="title_user_page">User</string>
+    <string name="take_pic_button">Take Profile Picture</string>
+    <string name="delete_pic_button">Delete Picture</string>
+    <string name="update_pic_button">Update Profile picture</string>
 </resources>

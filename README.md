@@ -1,2 +1,2 @@
 # 5G00EV05-3004-Android-final-project
-Final project for the course "Application Development and UI/UX" ("Sovellusten Ohjelmointi ja Käytettävyys").
+Just a wee project for the Android, get ya electric prices and stuff
