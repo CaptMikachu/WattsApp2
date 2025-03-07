@@ -106,6 +106,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import java.io.File
+import java.time.ZoneId
 
 
 const val BASE_URL = "https://api.porssisahko.net/"
@@ -397,8 +398,7 @@ fun Page1() {
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             try {
-                val response = RetrofitInstance.api.getPrices()
-                prices = response.prices
+                prices = fetchAndAdjustPrices()
                 //prices = dummyPrices
                 loading = false
             } catch (e: Exception) {
@@ -572,6 +572,24 @@ fun Page1() {
     }
 }
 
+// Fetches latest data, adjusts the time zone since the data is UTC+0
+// If API is used with specific hour, then it's the corrected time zone
+// That is not how it's fetched here
+suspend fun fetchAndAdjustPrices(): List<Price> {
+    val response = RetrofitInstance.api.getPrices()
+    val timeOffsetAmount = getCurrentTimeOffset()
+
+    return response.prices.map { price ->
+        val startDateTime = ZonedDateTime.parse(price.startDate).plusHours(timeOffsetAmount.toLong())
+        val endDateTime = ZonedDateTime.parse(price.endDate).plusHours(timeOffsetAmount.toLong())
+
+        Price(
+            price = price.price,
+            startDate = startDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+            endDate = endDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        )
+    }
+}
 
 data class Price(
     val price: Double,
@@ -596,6 +614,11 @@ object RetrofitInstance {
             .build()
             .create(ApiService::class.java)
     }
+}
+
+fun getCurrentTimeOffset(): Int {
+    val now = ZonedDateTime.now(ZoneId.of("Europe/Helsinki"))
+    return now.offset.totalSeconds / 3600
 }
 
 @SuppressLint("DefaultLocale")
@@ -1046,8 +1069,8 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
+            Spacer(modifier = Modifier.padding(20.dp))
             if (userName.isNotEmpty()) {
-                Spacer(modifier = Modifier.padding(30.dp))
                 Text(
                     text = stringResource(R.string.not, userName),
                     fontSize = 24.sp,
@@ -1059,48 +1082,57 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
                     Text(stringResource(R.string.delete_user_name))
                 }
                 Spacer(modifier = Modifier.padding(20.dp))
-                Text(
-                    text = stringResource(R.string.or_change_the_user_name),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(16.dp)
-                )
-                TextField(
-                    value = localUserName,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 16) {
-                            localUserName = newValue
-                            errorMessage = ""
-                        } else {
-                            errorMessage = "Username cannot exceed 16 characters"
-                        }
-                    },
-                    label = { Text(stringResource(R.string.name)) }
-                )
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
+//                Text(
+//                    text = stringResource(R.string.or_change_the_user_name),
+//                    fontSize = 24.sp,
+//                    modifier = Modifier.padding(16.dp)
+//                )
+//                TextField(
+//                    value = localUserName,
+//                    onValueChange = { newValue ->
+//                        if (newValue.length <= 16) {
+//                            localUserName = newValue
+//                            errorMessage = ""
+//                        } else {
+//                            errorMessage = "Username cannot exceed 16 characters"
+//                        }
+//                    },
+//                    label = { Text(stringResource(R.string.name)) }
+//                )
+//                if (errorMessage.isNotEmpty()) {
+//                    Text(
+//                        text = errorMessage,
+//                        color = Color.Red,
+//                        modifier = Modifier.padding(8.dp)
+//                    )
+//                }
             } else {
-                Spacer(modifier = Modifier.padding(30.dp))
                 Text(
                     text = stringResource(R.string.who_s_using_this_app),
                     fontSize = 24.sp,
                     modifier = Modifier.padding(16.dp)
                 )
+                val keyboardController = LocalSoftwareKeyboardController.current
                 TextField(
                     value = localUserName,
                     onValueChange = { newValue ->
-                        if (newValue.length <= 16) {
-                            localUserName = newValue
+                        val filteredValue = newValue.replace("\n", "")
+                        if (filteredValue.length <= 16) {
+                            localUserName = filteredValue
                             errorMessage = ""
                         } else {
                             errorMessage = "Username cannot exceed 16 characters"
                         }
                     },
-                    label = { Text(stringResource(R.string.textfield_label_name_2)) }
+                    label = { Text(stringResource(R.string.textfield_label_name_2)) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                        }
+                    )
                 )
                 if (errorMessage.isNotEmpty()) {
                     Text(
@@ -1109,21 +1141,22 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
                         modifier = Modifier.padding(8.dp)
                     )
                 }
-            }
-            Spacer(modifier = Modifier.padding(16.dp))
-            Button(onClick = {
-                if (localUserName.length <= 16) {
-                    onUserNameChange(localUserName)
+                Spacer(modifier = Modifier.padding(8.dp))
+                Button(onClick = {
+                    if (localUserName.length <= 16) {
+                        onUserNameChange(localUserName)
+                        localUserName = "" // Clear the input field
+                    }
+                }) {
+                    Text(stringResource(R.string.save_button))
                 }
-            }) {
-                Text(stringResource(R.string.save_button))
             }
         }
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                imageUri = null  // Reset imageUri to prevent flashing
+                imageUri = null  // Reset imageUri to prevent flashing the old image
                 val photoFile = File(context.filesDir, "photo.jpg")
                 val photoUri = FileProvider.getUriForFile(
                     context,
@@ -1159,14 +1192,14 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
             }
         }
 
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                recomposeTrigger = !recomposeTrigger
-            }) {
-                Text(stringResource(R.string.update_pic_button))
-            }
-        }
+//        item {
+//            Spacer(modifier = Modifier.height(16.dp))
+//            Button(onClick = {
+//                recomposeTrigger = !recomposeTrigger
+//            }) {
+//                Text(stringResource(R.string.update_pic_button))
+//            }
+//        }
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
