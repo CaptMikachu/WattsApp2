@@ -95,6 +95,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -119,165 +120,77 @@ const val API_MAIN_PAGE_URL = "https://www.porssisahko.net/api"
 
 
 val dummyPrices = listOf(
-    Price(5.874, "2024-12-13T07:00:00.000Z", "2024-12-13T08:00:00.000Z"),
-    Price(9.457, "2024-12-13T06:00:00.000Z", "2024-12-13T07:00:00.000Z"),
-    Price(0.2, "2024-12-13T05:00:00.000Z", "2024-12-13T06:00:00.000Z"),
-    Price(10.899, "2024-12-13T04:00:00.000Z", "2024-12-13T05:00:00.000Z"),
-    Price(3.172, "2024-12-13T03:00:00.000Z", "2024-12-13T04:00:00.000Z"),
-    Price(11.0, "2024-12-13T02:00:00.000Z", "2024-12-13T03:00:00.000Z"),
-    Price(0.2, "2024-12-13T01:00:00.000Z", "2024-12-13T02:00:00.000Z"),
-    Price(9.113, "2024-12-13T00:00:00.000Z", "2024-12-13T01:00:00.000Z"),
-    Price(3.533, "2024-12-12T23:00:00.000Z", "2024-12-13T00:00:00.000Z"),
-    Price(3.533, "2024-12-12T22:00:00.000Z", "2024-12-12T23:00:00.000Z"),
-    Price(-26.333, "2024-12-12T21:00:00.000Z", "2024-12-12T22:00:00.000Z"),
-    Price(0.0, "2024-12-12T20:00:00.000Z", "2024-12-12T21:00:00.000Z"),
-    Price(8.757, "2024-12-12T19:00:00.000Z", "2024-12-12T20:00:00.000Z"),
-    Price(-10.58, "2024-12-12T18:00:00.000Z", "2024-12-12T19:00:00.000Z"),
-    Price(14.761, "2024-12-12T17:00:00.000Z", "2024-12-12T18:00:00.000Z"),
-    Price(0.0, "2024-12-12T16:00:00.000Z", "2024-12-12T17:00:00.000Z"),
-    Price(25.104, "2024-12-12T15:00:00.000Z", "2024-12-12T16:00:00.000Z"),
-    Price(-128.118, "2024-12-12T14:00:00.000Z", "2024-12-12T15:00:00.000Z"),
-    Price(20.541, "2024-12-12T13:00:00.000Z", "2024-12-12T14:00:00.000Z"),
-    Price(14.761, "2024-12-12T12:00:00.000Z", "2024-12-12T13:00:00.000Z"),
-    Price(0.0, "2024-12-12T11:00:00.000Z", "2024-12-12T12:00:00.000Z"),
-    Price(25.104, "2024-12-12T10:00:00.000Z", "2024-12-12T11:00:00.000Z"),
-    Price(-28.118, "2024-12-12T09:00:00.000Z", "2024-12-12T10:00:00.000Z"),
-    Price(20.541, "2024-12-12T08:00:00.000Z", "2024-12-12T09:00:00.000Z")
-)
-
-val dummyPrices2 = listOf(
-    Price(3.85, "2024-12-13T07:00:00.000Z", "2024-12-13T08:00:00.000Z"),
-    Price(4.72, "2024-12-13T06:00:00.000Z", "2024-12-13T07:00:00.000Z"),
-    Price(3.45, "2024-12-13T05:00:00.000Z", "2024-12-13T06:00:00.000Z"),
-    Price(5.03, "2024-12-13T04:00:00.000Z", "2024-12-13T05:00:00.000Z"),
-    Price(3.62, "2024-12-13T03:00:00.000Z", "2024-12-13T04:00:00.000Z"),
-    Price(5.2, "2024-12-13T02:00:00.000Z", "2024-12-13T03:00:00.000Z"),
-    Price(3.45, "2024-12-13T01:00:00.000Z", "2024-12-13T02:00:00.000Z"),
-    Price(4.64, "2024-12-13T00:00:00.000Z", "2024-12-13T01:00:00.000Z"),
-    Price(3.85, "2024-12-12T23:00:00.000Z", "2024-12-13T00:00:00.000Z"),
-    Price(3.85, "2024-12-12T22:00:00.000Z", "2024-12-12T23:00:00.000Z"),
-    Price(3.45, "2024-12-12T21:00:00.000Z", "2024-12-12T22:00:00.000Z"),
-    Price(3.45, "2024-12-12T20:00:00.000Z", "2024-12-12T21:00:00.000Z"),
-    Price(4.38, "2024-12-12T19:00:00.000Z", "2024-12-12T20:00:00.000Z"),
-    Price(3.45, "2024-12-12T18:00:00.000Z", "2024-12-12T19:00:00.000Z"),
-    Price(4.92, "2024-12-12T17:00:00.000Z", "2024-12-12T18:00:00.000Z"),
-    Price(3.45, "2024-12-12T16:00:00.000Z", "2024-12-12T17:00:00.000Z"),
-    Price(5.08, "2024-12-12T15:00:00.000Z", "2024-12-12T16:00:00.000Z"),
-    Price(3.45, "2024-12-12T14:00:00.000Z", "2024-12-12T15:00:00.000Z"),
-    Price(4.85, "2024-12-12T13:00:00.000Z", "2024-12-12T14:00:00.000Z"),
-    Price(4.92, "2024-12-12T12:00:00.000Z", "2024-12-12T13:00:00.000Z"),
-    Price(3.45, "2024-12-12T11:00:00.000Z", "2024-12-12T12:00:00.000Z"),
-    Price(5.08, "2024-12-12T10:00:00.000Z", "2024-12-12T11:00:00.000Z"),
-    Price(3.45, "2024-12-12T09:00:00.000Z", "2024-12-12T10:00:00.000Z"),
-    Price(4.85, "2024-12-12T08:00:00.000Z", "2024-12-12T09:00:00.000Z")
-)
-
-val dummyPrices3 = listOf(
-    // March 7, 2025 (00:00 - 23:00)
-    Price(15.74, "2025-03-07T00:00:00.000Z", "2025-03-07T01:00:00.000Z"),
-    Price(-9.45, "2025-03-07T01:00:00.000Z", "2025-03-07T02:00:00.000Z"),
-    Price(7.32, "2025-03-07T02:00:00.000Z", "2025-03-07T03:00:00.000Z"),
-    Price(-12.89, "2025-03-07T03:00:00.000Z", "2025-03-07T04:00:00.000Z"),
-    Price(3.17, "2025-03-07T04:00:00.000Z", "2025-03-07T05:00:00.000Z"),
-    Price(0.54, "2025-03-07T05:00:00.000Z", "2025-03-07T06:00:00.000Z"),
-    Price(-20.58, "2025-03-07T06:00:00.000Z", "2025-03-07T07:00:00.000Z"),
-    Price(9.11, "2025-03-07T07:00:00.000Z", "2025-03-07T08:00:00.000Z"),
-    Price(-15.33, "2025-03-07T08:00:00.000Z", "2025-03-07T09:00:00.000Z"),
-    Price(6.78, "2025-03-07T09:00:00.000Z", "2025-03-07T10:00:00.000Z"),
-    Price(-8.92, "2025-03-07T10:00:00.000Z", "2025-03-07T11:00:00.000Z"),
-    Price(0.05, "2025-03-07T11:00:00.000Z", "2025-03-07T12:00:00.000Z"),
-    Price(10.75, "2025-03-07T12:00:00.000Z", "2025-03-07T13:00:00.000Z"),
-    Price(-18.58, "2025-03-07T13:00:00.000Z", "2025-03-07T14:00:00.000Z"),
-    Price(14.76, "2025-03-07T14:00:00.000Z", "2025-03-07T15:00:00.000Z"),
-    Price(-5.23, "2025-03-07T15:00:00.000Z", "2025-03-07T16:00:00.000Z"),
-    Price(25.10, "2025-03-07T16:00:00.000Z", "2025-03-07T17:00:00.000Z"),
-    Price(-30.11, "2025-03-07T17:00:00.000Z", "2025-03-07T18:00:00.000Z"),
-    Price(20.54, "2025-03-07T18:00:00.000Z", "2025-03-07T19:00:00.000Z"),
-    Price(-24.76, "2025-03-07T19:00:00.000Z", "2025-03-07T20:00:00.000Z"),
-    Price(0.00, "2025-03-07T20:00:00.000Z", "2025-03-07T21:00:00.000Z"),
-    Price(17.32, "2025-03-07T21:00:00.000Z", "2025-03-07T22:00:00.000Z"),
-    Price(-14.27, "2025-03-07T22:00:00.000Z", "2025-03-07T23:00:00.000Z"),
-    Price(8.64, "2025-03-07T23:00:00.000Z", "2025-03-08T00:00:00.000Z"),
-
-    // March 8, 2025 (00:00 - 23:00)
-    Price(15.74, "2025-03-08T00:00:00.000Z", "2025-03-08T01:00:00.000Z"),
-    Price(-9.45, "2025-03-08T01:00:00.000Z", "2025-03-08T02:00:00.000Z"),
-    Price(7.32, "2025-03-08T02:00:00.000Z", "2025-03-08T03:00:00.000Z"),
-    Price(-12.89, "2025-03-08T03:00:00.000Z", "2025-03-08T04:00:00.000Z"),
-    Price(3.17, "2025-03-08T04:00:00.000Z", "2025-03-08T05:00:00.000Z"),
-    Price(0.54, "2025-03-08T05:00:00.000Z", "2025-03-08T06:00:00.000Z"),
-    Price(-20.58, "2025-03-08T06:00:00.000Z", "2025-03-08T07:00:00.000Z"),
-    Price(9.11, "2025-03-08T07:00:00.000Z", "2025-03-08T08:00:00.000Z"),
-    Price(-15.33, "2025-03-08T08:00:00.000Z", "2025-03-08T09:00:00.000Z"),
-    Price(6.78, "2025-03-08T09:00:00.000Z", "2025-03-08T10:00:00.000Z"),
-    Price(-8.92, "2025-03-08T10:00:00.000Z", "2025-03-08T11:00:00.000Z"),
-    Price(0.05, "2025-03-08T11:00:00.000Z", "2025-03-08T12:00:00.000Z"),
-    Price(10.75, "2025-03-08T12:00:00.000Z", "2025-03-08T13:00:00.000Z"),
-    Price(-18.58, "2025-03-08T13:00:00.000Z", "2025-03-08T14:00:00.000Z"),
-    Price(14.76, "2025-03-08T14:00:00.000Z", "2025-03-08T15:00:00.000Z"),
-    Price(-5.23, "2025-03-08T15:00:00.000Z", "2025-03-08T16:00:00.000Z"),
-    Price(25.10, "2025-03-08T16:00:00.000Z", "2025-03-08T17:00:00.000Z"),
-    Price(-30.11, "2025-03-08T17:00:00.000Z", "2025-03-08T18:00:00.000Z"),
-    Price(20.54, "2025-03-08T18:00:00.000Z", "2025-03-08T19:00:00.000Z"),
-    Price(-24.76, "2025-03-08T19:00:00.000Z", "2025-03-08T20:00:00.000Z"),
-    Price(0.00, "2025-03-08T20:00:00.000Z", "2025-03-08T21:00:00.000Z"),
-    Price(17.32, "2025-03-08T21:00:00.000Z", "2025-03-08T22:00:00.000Z"),
-    Price(-14.27, "2025-03-08T22:00:00.000Z", "2025-03-08T23:00:00.000Z"),
-    Price(8.64, "2025-03-08T23:00:00.000Z", "2025-03-09T00:00:00.000Z")
-)
-
-val dummyPrices4 = listOf(
-    // March 7, 2025 (00:00 - 23:00)
-    Price(5.12, "2025-03-07T00:00:00.000Z", "2025-03-07T01:00:00.000Z"),
-    Price(3.45, "2025-03-07T01:00:00.000Z", "2025-03-07T02:00:00.000Z"),
-    Price(7.82, "2025-03-07T02:00:00.000Z", "2025-03-07T03:00:00.000Z"),
-    Price(2.19, "2025-03-07T03:00:00.000Z", "2025-03-07T04:00:00.000Z"),
-    Price(4.67, "2025-03-07T04:00:00.000Z", "2025-03-07T05:00:00.000Z"),
-    Price(8.34, "2025-03-07T05:00:00.000Z", "2025-03-07T06:00:00.000Z"),
-    Price(1.58, "2025-03-07T06:00:00.000Z", "2025-03-07T07:00:00.000Z"),
-    Price(6.91, "2025-03-07T07:00:00.000Z", "2025-03-07T08:00:00.000Z"),
-    Price(3.33, "2025-03-07T08:00:00.000Z", "2025-03-07T09:00:00.000Z"),
-    Price(9.78, "2025-03-07T09:00:00.000Z", "2025-03-07T10:00:00.000Z"),
-    Price(4.92, "2025-03-07T10:00:00.000Z", "2025-03-07T11:00:00.000Z"),
-    Price(0.05, "2025-03-07T11:00:00.000Z", "2025-03-07T12:00:00.000Z"),
-    Price(7.75, "2025-03-07T12:00:00.000Z", "2025-03-07T13:00:00.000Z"),
-    Price(5.28, "2025-03-07T13:00:00.000Z", "2025-03-07T14:00:00.000Z"),
-    Price(2.76, "2025-03-07T14:00:00.000Z", "2025-03-07T15:00:00.000Z"),
-    Price(6.23, "2025-03-07T15:00:00.000Z", "2025-03-07T16:00:00.000Z"),
-    Price(8.10, "2025-03-07T16:00:00.000Z", "2025-03-07T17:00:00.000Z"),
-    Price(2.00, "2025-03-07T17:00:00.000Z", "2025-03-07T18:00:00.000Z"),  // Only negative value
-    Price(9.54, "2025-03-07T18:00:00.000Z", "2025-03-07T19:00:00.000Z"),
-    Price(4.76, "2025-03-07T19:00:00.000Z", "2025-03-07T20:00:00.000Z"),
-    Price(1.20, "2025-03-07T20:00:00.000Z", "2025-03-07T21:00:00.000Z"),
-    Price(7.32, "2025-03-07T21:00:00.000Z", "2025-03-07T22:00:00.000Z"),
-    Price(3.27, "2025-03-07T22:00:00.000Z", "2025-03-07T23:00:00.000Z"),
-    Price(5.64, "2025-03-07T23:00:00.000Z", "2025-03-08T00:00:00.000Z"),
-
-    // March 8, 2025 (00:00 - 23:00)
-    Price(4.74, "2025-03-08T00:00:00.000Z", "2025-03-08T01:00:00.000Z"),
-    Price(2.45, "2025-03-08T01:00:00.000Z", "2025-03-08T02:00:00.000Z"),
-    Price(6.32, "2025-03-08T02:00:00.000Z", "2025-03-08T03:00:00.000Z"),
-    Price(8.89, "2025-03-08T03:00:00.000Z", "2025-03-08T04:00:00.000Z"),
-    Price(-2.00, "2025-03-08T04:00:00.000Z", "2025-03-08T05:00:00.000Z"),
-    Price(5.54, "2025-03-08T05:00:00.000Z", "2025-03-08T06:00:00.000Z"),
-    Price(7.58, "2025-03-08T06:00:00.000Z", "2025-03-08T07:00:00.000Z"),
-    Price(2.11, "2025-03-08T07:00:00.000Z", "2025-03-08T08:00:00.000Z"),
-    Price(9.33, "2025-03-08T08:00:00.000Z", "2025-03-08T09:00:00.000Z"),
-    Price(4.78, "2025-03-08T09:00:00.000Z", "2025-03-08T10:00:00.000Z"),
-    Price(1.92, "2025-03-08T10:00:00.000Z", "2025-03-08T11:00:00.000Z"),
-    Price(6.05, "2025-03-08T11:00:00.000Z", "2025-03-08T12:00:00.000Z"),
-    Price(3.75, "2025-03-08T12:00:00.000Z", "2025-03-08T13:00:00.000Z"),
-    Price(8.58, "2025-03-08T13:00:00.000Z", "2025-03-08T14:00:00.000Z"),
-    Price(5.76, "2025-03-08T14:00:00.000Z", "2025-03-08T15:00:00.000Z"),
-    Price(2.23, "2025-03-08T15:00:00.000Z", "2025-03-08T16:00:00.000Z"),
-    Price(7.10, "2025-03-08T16:00:00.000Z", "2025-03-08T17:00:00.000Z"),
-    Price(4.11, "2025-03-08T17:00:00.000Z", "2025-03-08T18:00:00.000Z"),
-    Price(9.54, "2025-03-08T18:00:00.000Z", "2025-03-08T19:00:00.000Z"),
-    Price(3.76, "2025-03-08T19:00:00.000Z", "2025-03-08T20:00:00.000Z"),
-    Price(1.00, "2025-03-08T20:00:00.000Z", "2025-03-08T21:00:00.000Z"),
-    Price(6.32, "2025-03-08T21:00:00.000Z", "2025-03-08T22:00:00.000Z"),
-    Price(4.27, "2025-03-08T22:00:00.000Z", "2025-03-08T23:00:00.000Z"),
-    Price(2.64, "2025-03-08T23:00:00.000Z", "2025-03-09T00:00:00.000Z")
+    Price(5.874, "2025-03-08T00:00:00.000Z", "2025-03-08T01:00:00.000Z"),
+    Price(9.457, "2025-03-08T01:00:00.000Z", "2025-03-08T02:00:00.000Z"),
+    Price(0.2, "2025-03-08T02:00:00.000Z", "2025-03-08T03:00:00.000Z"),
+    Price(10.899, "2025-03-08T03:00:00.000Z", "2025-03-08T04:00:00.000Z"),
+    Price(3.172, "2025-03-08T04:00:00.000Z", "2025-03-08T05:00:00.000Z"),
+    Price(11.0, "2025-03-08T05:00:00.000Z", "2025-03-08T06:00:00.000Z"),
+    Price(0.2, "2025-03-08T06:00:00.000Z", "2025-03-08T07:00:00.000Z"),
+    Price(9.113, "2025-03-08T07:00:00.000Z", "2025-03-08T08:00:00.000Z"),
+    Price(3.533, "2025-03-08T08:00:00.000Z", "2025-03-08T09:00:00.000Z"),
+    Price(3.533, "2025-03-08T09:00:00.000Z", "2025-03-08T10:00:00.000Z"),
+    Price(-26.333, "2025-03-08T10:00:00.000Z", "2025-03-08T11:00:00.000Z"),
+    Price(0.0, "2025-03-08T11:00:00.000Z", "2025-03-08T12:00:00.000Z"),
+    Price(8.757, "2025-03-08T12:00:00.000Z", "2025-03-08T13:00:00.000Z"),
+    Price(-10.58, "2025-03-08T13:00:00.000Z", "2025-03-08T14:00:00.000Z"),
+    Price(14.761, "2025-03-08T14:00:00.000Z", "2025-03-08T15:00:00.000Z"),
+    Price(0.0, "2025-03-08T15:00:00.000Z", "2025-03-08T16:00:00.000Z"),
+    Price(25.104, "2025-03-08T16:00:00.000Z", "2025-03-08T17:00:00.000Z"),
+    Price(-128.118, "2025-03-08T17:00:00.000Z", "2025-03-08T18:00:00.000Z"),
+    Price(20.541, "2025-03-08T18:00:00.000Z", "2025-03-08T19:00:00.000Z"),
+    Price(14.761, "2025-03-08T19:00:00.000Z", "2025-03-08T20:00:00.000Z"),
+    Price(0.0, "2025-03-08T20:00:00.000Z", "2025-03-08T21:00:00.000Z"),
+    Price(25.104, "2025-03-08T21:00:00.000Z", "2025-03-08T22:00:00.000Z"),
+    Price(-28.118, "2025-03-08T22:00:00.000Z", "2025-03-08T23:00:00.000Z"),
+    Price(20.541, "2025-03-08T23:00:00.000Z", "2025-03-09T00:00:00.000Z"),
+    Price(3.85, "2025-03-09T00:00:00.000Z", "2025-03-09T01:00:00.000Z"),
+    Price(4.72, "2025-03-09T01:00:00.000Z", "2025-03-09T02:00:00.000Z"),
+    Price(3.45, "2025-03-09T02:00:00.000Z", "2025-03-09T03:00:00.000Z"),
+    Price(5.03, "2025-03-09T03:00:00.000Z", "2025-03-09T04:00:00.000Z"),
+    Price(3.62, "2025-03-09T04:00:00.000Z", "2025-03-09T05:00:00.000Z"),
+    Price(5.2, "2025-03-09T05:00:00.000Z", "2025-03-09T06:00:00.000Z"),
+    Price(3.45, "2025-03-09T06:00:00.000Z", "2025-03-09T07:00:00.000Z"),
+    Price(4.64, "2025-03-09T07:00:00.000Z", "2025-03-09T08:00:00.000Z"),
+    Price(3.85, "2025-03-09T08:00:00.000Z", "2025-03-09T09:00:00.000Z"),
+    Price(3.85, "2025-03-09T09:00:00.000Z", "2025-03-09T10:00:00.000Z"),
+    Price(3.45, "2025-03-09T10:00:00.000Z", "2025-03-09T11:00:00.000Z"),
+    Price(3.45, "2025-03-09T11:00:00.000Z", "2025-03-09T12:00:00.000Z"),
+    Price(4.38, "2025-03-09T12:00:00.000Z", "2025-03-09T13:00:00.000Z"),
+    Price(3.45, "2025-03-09T13:00:00.000Z", "2025-03-09T14:00:00.000Z"),
+    Price(4.92, "2025-03-09T14:00:00.000Z", "2025-03-09T15:00:00.000Z"),
+    Price(3.45, "2025-03-09T15:00:00.000Z", "2025-03-09T16:00:00.000Z"),
+    Price(5.08, "2025-03-09T16:00:00.000Z", "2025-03-09T17:00:00.000Z"),
+    Price(3.45, "2025-03-09T17:00:00.000Z", "2025-03-09T18:00:00.000Z"),
+    Price(4.85, "2025-03-09T18:00:00.000Z", "2025-03-09T19:00:00.000Z"),
+    Price(4.92, "2025-03-09T19:00:00.000Z", "2025-03-09T20:00:00.000Z"),
+    Price(3.45, "2025-03-09T20:00:00.000Z", "2025-03-09T21:00:00.000Z"),
+    Price(5.08, "2025-03-09T21:00:00.000Z", "2025-03-09T22:00:00.000Z"),
+    Price(3.45, "2025-03-09T22:00:00.000Z", "2025-03-09T23:00:00.000Z"),
+    Price(4.85, "2025-03-09T23:00:00.000Z", "2025-03-10T00:00:00.000Z"),
+    Price(15.74, "2025-03-10T00:00:00.000Z", "2025-03-10T01:00:00.000Z"),
+    Price(-9.45, "2025-03-10T01:00:00.000Z", "2025-03-10T02:00:00.000Z"),
+    Price(7.32, "2025-03-10T02:00:00.000Z", "2025-03-10T03:00:00.000Z"),
+    Price(-12.89, "2025-03-10T03:00:00.000Z", "2025-03-10T04:00:00.000Z"),
+    Price(3.17, "2025-03-10T04:00:00.000Z", "2025-03-10T05:00:00.000Z"),
+    Price(0.54, "2025-03-10T05:00:00.000Z", "2025-03-10T06:00:00.000Z"),
+    Price(-20.58, "2025-03-10T06:00:00.000Z", "2025-03-10T07:00:00.000Z"),
+    Price(9.11, "2025-03-10T07:00:00.000Z", "2025-03-10T08:00:00.000Z"),
+    Price(-15.33, "2025-03-10T08:00:00.000Z", "2025-03-10T09:00:00.000Z"),
+    Price(6.78, "2025-03-10T09:00:00.000Z", "2025-03-10T10:00:00.000Z"),
+    Price(-8.92, "2025-03-10T10:00:00.000Z", "2025-03-10T11:00:00.000Z"),
+    Price(0.05, "2025-03-10T11:00:00.000Z", "2025-03-10T12:00:00.000Z"),
+    Price(10.75, "2025-03-10T12:00:00.000Z", "2025-03-10T13:00:00.000Z"),
+    Price(-18.58, "2025-03-10T13:00:00.000Z", "2025-03-10T14:00:00.000Z"),
+    Price(14.76, "2025-03-10T14:00:00.000Z", "2025-03-10T15:00:00.000Z"),
+    Price(-5.23, "2025-03-10T15:00:00.000Z", "2025-03-10T16:00:00.000Z"),
+    Price(25.10, "2025-03-10T16:00:00.000Z", "2025-03-10T17:00:00.000Z"),
+    Price(-30.11, "2025-03-10T17:00:00.000Z", "2025-03-10T18:00:00.000Z"),
+    Price(20.54, "2025-03-10T18:00:00.000Z", "2025-03-10T19:00:00.000Z"),
+    Price(-24.76, "2025-03-10T19:00:00.000Z", "2025-03-10T20:00:00.000Z"),
+    Price(0.00, "2025-03-10T20:00:00.000Z", "2025-03-10T21:00:00.000Z"),
+    Price(17.32, "2025-03-10T21:00:00.000Z", "2025-03-10T22:00:00.000Z"),
+    Price(-14.27, "2025-03-10T22:00:00.000Z", "2025-03-10T23:00:00.000Z")
 )
 
 class MainActivity : ComponentActivity() {
@@ -347,6 +260,7 @@ fun WattsApp(sharedPreferences: SharedPreferences, userName: String, onUserNameC
 fun TopBar(navController: NavHostController, sharedPreferences: SharedPreferences) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val context = LocalContext.current
 
     val title = when (currentRoute) {
         "page1" -> stringResource(R.string.home_title)
@@ -355,7 +269,12 @@ fun TopBar(navController: NavHostController, sharedPreferences: SharedPreference
         "page4" -> stringResource(R.string.title_user_page)
         else -> stringResource(R.string.app_name)
     }
+
     val userName = sharedPreferences.getString("user_name", "") ?: ""
+    val imageUriString = sharedPreferences.getString("image_uri", null)
+    val imageUri = remember(imageUriString) {
+        imageUriString?.let { Uri.parse(it) }
+    }
 
     TopAppBar(
         title = {
@@ -367,29 +286,71 @@ fun TopBar(navController: NavHostController, sharedPreferences: SharedPreference
                 Text(
                     text = title,
                     textAlign = TextAlign.Start,
-                    fontSize = 25.sp,
-                    modifier = Modifier.padding(start= 8.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(start= 6.dp, top = 16.dp, end = 12.dp, bottom = 16.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(0.dp, 0.dp, 16.dp, 0.dp)
+                    modifier = Modifier
+                        .padding(0.dp, 0.dp, 16.dp, 0.dp)
+                        //.background(MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.2f))
                 ) {
-                    if (userName.isNotEmpty()) {
+                    if (imageUri != null) {
+                        // Load bitmap separately from composable functions
+                        val bitmap = remember(imageUri) {
+                            try {
+                                MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
+
+                        // Display based on bitmap loading result
+                        if (bitmap != null) {
+                            Image(
+                                bitmap = bitmap.asImageBitmap(),
+                                contentDescription = "User Profile",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    //.size(if (userName.length > 6) 12.dp else 24.dp)
+                                    .clip(CircleShape)
+                                    .rotate(90f)
+                                    .align(Alignment.CenterHorizontally),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else if (userName.isNotEmpty()) {
+                            // Fallback to icon if image loading failed
+                            Icon(
+                                Icons.Filled.Person,
+                                contentDescription = "User",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .size(24.dp)
+                                    //.size(if (userName.length > 6) 12.dp else 24.dp)
+                            )
+                        }
+                    } else if (userName.isNotEmpty()) {
+                        // Show default icon only if there's a username but no image
                         Icon(
                             Icons.Filled.Person,
                             contentDescription = "User",
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
-                                .size(if (userName.length > 5) 12.dp else 24.dp)
+                                .size(24.dp)
+                                //.size(if (userName.length > 6) 12.dp else 24.dp)
                         )
+                    }
+
+                    // Always show username if it exists
+                    if (userName.isNotEmpty()) {
                         Text(
                             text = userName,
-                            fontSize = if (userName.length > 5) 10.sp else 15.sp,
+                            fontSize = if (userName.length > 8) 6.sp else 12.sp,
                             textAlign = TextAlign.Center
-
                         )
                     }
                 }
@@ -511,7 +472,7 @@ fun Page1() {
         coroutineScope.launch {
             try {
                 prices = fetchAndAdjustPrices()
-                //prices = dummyPrices3
+                //prices = dummyPrices
                 loading = false
             } catch (e: Exception) {
                 error = e.message
@@ -534,7 +495,14 @@ fun Page1() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Error: $error")
+            Text(
+                text = "Error: $error",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .fillMaxWidth(),
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     } else {
 
@@ -549,11 +517,11 @@ fun Page1() {
                 Text(
                     text = stringResource(R.string.cents_kwh_prices),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp)
                 )
             }
             item{
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
             item{
                 BarChart(prices = prices)
@@ -767,48 +735,90 @@ fun getCurrentTimeOffset(): Int {
 @SuppressLint("DefaultLocale")
 @Composable
 fun BarChart(prices: List<Price>) {
+    // Round all prices to one decimal for the graph
+    val roundedPrices = prices.map {
+        it.copy(price = (it.price * 10).toInt() / 10.0)
+    }
+
+    // Create a mapping between rounded and original prices
+    val priceMapping = prices.mapIndexed { index, original ->
+        roundedPrices[index] to original
+    }.toMap()
+
     val currentTime = ZonedDateTime.now()
-    val startTime = currentTime.minusHours(4)
+    val startTime = currentTime.minusHours(3)
     val endTime = startTime.plusHours(12)
-    val filteredPrices = prices.filter {
+
+    // Filter and sort using rounded prices for visualization
+    val filteredRoundedPrices = roundedPrices.filter {
         val priceTime = ZonedDateTime.parse(it.startDate)
         priceTime.isAfter(startTime) && priceTime.isBefore(endTime)
     }.sortedBy { ZonedDateTime.parse(it.startDate) }
-    val maxPrice = filteredPrices.maxOfOrNull { it.price } ?: 0.0
-    val minPrice = filteredPrices.minOfOrNull { it.price } ?: 0.0
+
+    // Create parallel list with original prices in same order
+    val filteredOriginalPrices = filteredRoundedPrices.map { rounded ->
+        prices.find {
+            it.startDate == rounded.startDate && it.endDate == rounded.endDate
+        }!!
+    }
+
+    val maxPrice = filteredRoundedPrices.maxOfOrNull { it.price } ?: 0.0
+    val minPrice = filteredRoundedPrices.minOfOrNull { it.price } ?: 0.0
     val hasNegativeValues = minPrice < 0
 
     // Adjust minYValue to 0 if all values are positive
     val minYValue = if (hasNegativeValues) minPrice else 0.0
     val yRange = (maxPrice - minYValue).coerceAtLeast(0.1) // Ensure non-zero range
 
+    // Determine number of grid lines based on price range
+    val numLines = when {
+        yRange < 0.1 -> 3
+        yRange < 2.0 -> 5
+        yRange < 6.0 -> 7
+        yRange < 10.0 -> 9
+        else -> 9
+    }
+
     var selectedPrice by remember { mutableStateOf<Triple<Double, String, String>?>(null) }
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val currentTimeFormatted = currentTime.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy"))
-    val currentPrice = filteredPrices.find { ZonedDateTime.parse(it.startDate).hour == currentTime.hour }?.price ?: 0.0
+    val currentPrice = filteredRoundedPrices.find { ZonedDateTime.parse(it.startDate).hour == currentTime.hour }?.price ?: 0.0
+
+    // Graph height based on number of grid lines, which is based on price range
+    val canvasHeight = when {
+        numLines == 3 -> 140
+        numLines == 5 -> 160
+        numLines == 7 -> 180
+        numLines == 9 -> 200
+        else -> 200
+    }
+
+    val barGap = 6
 
     Canvas(modifier = Modifier
         .padding(start = 40.dp, top = 16.dp, end = 16.dp, bottom = 32.dp)
         .fillMaxWidth()
-        .height(200.dp) // Fixed height for the chart
+        .height(canvasHeight.dp)
         .pointerInput(Unit) {
             detectTapGestures { offset ->
-                val gap = 4.dp.toPx()
-                val barWidth = (size.width - gap * (filteredPrices.size - 1)) / filteredPrices.size
+                val gap = barGap.dp.toPx()
+                val barWidth = (size.width - gap * (filteredRoundedPrices.size - 1)) / filteredRoundedPrices.size
                 val index = (offset.x / (barWidth + gap)).toInt()
-                if (index in filteredPrices.indices) {
-                    val price = filteredPrices[index]
-                    val dateTime = ZonedDateTime.parse(price.startDate)
+                if (index in filteredRoundedPrices.indices) {
+                    // Use the original price for the detail box
+                    val originalPrice = filteredOriginalPrices[index]
+                    val dateTime = ZonedDateTime.parse(originalPrice.startDate)
                     val time = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
                     val date = dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                    selectedPrice = Triple(price.price, time, date)
+                    selectedPrice = Triple(originalPrice.price, time, date)
                     selectedIndex = index
                 }
             }
         }
     ) {
-        val gap = 6.dp.toPx()
-        val barWidth = (size.width - gap * (filteredPrices.size - 1)) / filteredPrices.size
+
+        val gap = barGap.dp.toPx()
+        val barWidth = (size.width - gap * (filteredRoundedPrices.size - 1)) / filteredRoundedPrices.size
         val cornerRadius = 3.dp.toPx()
 
         // Calculate zero Y position
@@ -819,8 +829,7 @@ fun BarChart(prices: List<Price>) {
             size.height // If no negative values, zero line at bottom
         }
 
-        // Draw 8 evenly spaced horizontal grid lines
-        val numLines = 8
+        // Draw adaptive number of evenly spaced horizontal grid lines
         val yStep = yRange / (numLines - 1)
 
         for (i in 0 until numLines) {
@@ -864,7 +873,7 @@ fun BarChart(prices: List<Price>) {
         }
 
         // Draw the bars
-        filteredPrices.forEachIndexed { index, price ->
+        filteredRoundedPrices.forEachIndexed { index, price ->
             val barHeightPercentage = abs(price.price / yRange).toFloat()
             val barHeight = barHeightPercentage * size.height
             val xOffset = index * (barWidth + gap)
@@ -1397,11 +1406,12 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
                     value = localUserName,
                     onValueChange = { newValue ->
                         val filteredValue = newValue.replace("\n", "")
-                        if (filteredValue.length <= 16) {
+                        if (filteredValue.length <= 10) {
                             localUserName = filteredValue
                             errorMessage = ""
                         } else {
-                            errorMessage = "Username cannot exceed 16 characters"
+                            errorMessage = ""
+                            //errorMessage = "Username cannot exceed 10 characters"
                         }
                     },
                     label = { Text(stringResource(R.string.textfield_label_name_2)) },
