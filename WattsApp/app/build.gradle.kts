@@ -66,6 +66,8 @@ dependencies {
     // If you want to additionally use the CameraX Extensions library
     implementation("androidx.camera:camera-extensions:${cameraxVersion}")
 
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

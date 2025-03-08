@@ -105,8 +105,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.example.wattsapp.ui.theme.onBackgroundLight
+import com.example.wattsapp.ui.theme.scrimLight
+import com.example.wattsapp.ui.theme.tertiaryLight
 import java.io.File
 import java.time.ZoneId
+import kotlin.math.abs
 
 
 const val BASE_URL = "https://api.porssisahko.net/"
@@ -166,6 +170,114 @@ val dummyPrices2 = listOf(
     Price(5.08, "2024-12-12T10:00:00.000Z", "2024-12-12T11:00:00.000Z"),
     Price(3.45, "2024-12-12T09:00:00.000Z", "2024-12-12T10:00:00.000Z"),
     Price(4.85, "2024-12-12T08:00:00.000Z", "2024-12-12T09:00:00.000Z")
+)
+
+val dummyPrices3 = listOf(
+    // March 7, 2025 (00:00 - 23:00)
+    Price(15.74, "2025-03-07T00:00:00.000Z", "2025-03-07T01:00:00.000Z"),
+    Price(-9.45, "2025-03-07T01:00:00.000Z", "2025-03-07T02:00:00.000Z"),
+    Price(7.32, "2025-03-07T02:00:00.000Z", "2025-03-07T03:00:00.000Z"),
+    Price(-12.89, "2025-03-07T03:00:00.000Z", "2025-03-07T04:00:00.000Z"),
+    Price(3.17, "2025-03-07T04:00:00.000Z", "2025-03-07T05:00:00.000Z"),
+    Price(0.54, "2025-03-07T05:00:00.000Z", "2025-03-07T06:00:00.000Z"),
+    Price(-20.58, "2025-03-07T06:00:00.000Z", "2025-03-07T07:00:00.000Z"),
+    Price(9.11, "2025-03-07T07:00:00.000Z", "2025-03-07T08:00:00.000Z"),
+    Price(-15.33, "2025-03-07T08:00:00.000Z", "2025-03-07T09:00:00.000Z"),
+    Price(6.78, "2025-03-07T09:00:00.000Z", "2025-03-07T10:00:00.000Z"),
+    Price(-8.92, "2025-03-07T10:00:00.000Z", "2025-03-07T11:00:00.000Z"),
+    Price(0.05, "2025-03-07T11:00:00.000Z", "2025-03-07T12:00:00.000Z"),
+    Price(10.75, "2025-03-07T12:00:00.000Z", "2025-03-07T13:00:00.000Z"),
+    Price(-18.58, "2025-03-07T13:00:00.000Z", "2025-03-07T14:00:00.000Z"),
+    Price(14.76, "2025-03-07T14:00:00.000Z", "2025-03-07T15:00:00.000Z"),
+    Price(-5.23, "2025-03-07T15:00:00.000Z", "2025-03-07T16:00:00.000Z"),
+    Price(25.10, "2025-03-07T16:00:00.000Z", "2025-03-07T17:00:00.000Z"),
+    Price(-30.11, "2025-03-07T17:00:00.000Z", "2025-03-07T18:00:00.000Z"),
+    Price(20.54, "2025-03-07T18:00:00.000Z", "2025-03-07T19:00:00.000Z"),
+    Price(-24.76, "2025-03-07T19:00:00.000Z", "2025-03-07T20:00:00.000Z"),
+    Price(0.00, "2025-03-07T20:00:00.000Z", "2025-03-07T21:00:00.000Z"),
+    Price(17.32, "2025-03-07T21:00:00.000Z", "2025-03-07T22:00:00.000Z"),
+    Price(-14.27, "2025-03-07T22:00:00.000Z", "2025-03-07T23:00:00.000Z"),
+    Price(8.64, "2025-03-07T23:00:00.000Z", "2025-03-08T00:00:00.000Z"),
+
+    // March 8, 2025 (00:00 - 23:00)
+    Price(15.74, "2025-03-08T00:00:00.000Z", "2025-03-08T01:00:00.000Z"),
+    Price(-9.45, "2025-03-08T01:00:00.000Z", "2025-03-08T02:00:00.000Z"),
+    Price(7.32, "2025-03-08T02:00:00.000Z", "2025-03-08T03:00:00.000Z"),
+    Price(-12.89, "2025-03-08T03:00:00.000Z", "2025-03-08T04:00:00.000Z"),
+    Price(3.17, "2025-03-08T04:00:00.000Z", "2025-03-08T05:00:00.000Z"),
+    Price(0.54, "2025-03-08T05:00:00.000Z", "2025-03-08T06:00:00.000Z"),
+    Price(-20.58, "2025-03-08T06:00:00.000Z", "2025-03-08T07:00:00.000Z"),
+    Price(9.11, "2025-03-08T07:00:00.000Z", "2025-03-08T08:00:00.000Z"),
+    Price(-15.33, "2025-03-08T08:00:00.000Z", "2025-03-08T09:00:00.000Z"),
+    Price(6.78, "2025-03-08T09:00:00.000Z", "2025-03-08T10:00:00.000Z"),
+    Price(-8.92, "2025-03-08T10:00:00.000Z", "2025-03-08T11:00:00.000Z"),
+    Price(0.05, "2025-03-08T11:00:00.000Z", "2025-03-08T12:00:00.000Z"),
+    Price(10.75, "2025-03-08T12:00:00.000Z", "2025-03-08T13:00:00.000Z"),
+    Price(-18.58, "2025-03-08T13:00:00.000Z", "2025-03-08T14:00:00.000Z"),
+    Price(14.76, "2025-03-08T14:00:00.000Z", "2025-03-08T15:00:00.000Z"),
+    Price(-5.23, "2025-03-08T15:00:00.000Z", "2025-03-08T16:00:00.000Z"),
+    Price(25.10, "2025-03-08T16:00:00.000Z", "2025-03-08T17:00:00.000Z"),
+    Price(-30.11, "2025-03-08T17:00:00.000Z", "2025-03-08T18:00:00.000Z"),
+    Price(20.54, "2025-03-08T18:00:00.000Z", "2025-03-08T19:00:00.000Z"),
+    Price(-24.76, "2025-03-08T19:00:00.000Z", "2025-03-08T20:00:00.000Z"),
+    Price(0.00, "2025-03-08T20:00:00.000Z", "2025-03-08T21:00:00.000Z"),
+    Price(17.32, "2025-03-08T21:00:00.000Z", "2025-03-08T22:00:00.000Z"),
+    Price(-14.27, "2025-03-08T22:00:00.000Z", "2025-03-08T23:00:00.000Z"),
+    Price(8.64, "2025-03-08T23:00:00.000Z", "2025-03-09T00:00:00.000Z")
+)
+
+val dummyPrices4 = listOf(
+    // March 7, 2025 (00:00 - 23:00)
+    Price(5.12, "2025-03-07T00:00:00.000Z", "2025-03-07T01:00:00.000Z"),
+    Price(3.45, "2025-03-07T01:00:00.000Z", "2025-03-07T02:00:00.000Z"),
+    Price(7.82, "2025-03-07T02:00:00.000Z", "2025-03-07T03:00:00.000Z"),
+    Price(2.19, "2025-03-07T03:00:00.000Z", "2025-03-07T04:00:00.000Z"),
+    Price(4.67, "2025-03-07T04:00:00.000Z", "2025-03-07T05:00:00.000Z"),
+    Price(8.34, "2025-03-07T05:00:00.000Z", "2025-03-07T06:00:00.000Z"),
+    Price(1.58, "2025-03-07T06:00:00.000Z", "2025-03-07T07:00:00.000Z"),
+    Price(6.91, "2025-03-07T07:00:00.000Z", "2025-03-07T08:00:00.000Z"),
+    Price(3.33, "2025-03-07T08:00:00.000Z", "2025-03-07T09:00:00.000Z"),
+    Price(9.78, "2025-03-07T09:00:00.000Z", "2025-03-07T10:00:00.000Z"),
+    Price(4.92, "2025-03-07T10:00:00.000Z", "2025-03-07T11:00:00.000Z"),
+    Price(0.05, "2025-03-07T11:00:00.000Z", "2025-03-07T12:00:00.000Z"),
+    Price(7.75, "2025-03-07T12:00:00.000Z", "2025-03-07T13:00:00.000Z"),
+    Price(5.28, "2025-03-07T13:00:00.000Z", "2025-03-07T14:00:00.000Z"),
+    Price(2.76, "2025-03-07T14:00:00.000Z", "2025-03-07T15:00:00.000Z"),
+    Price(6.23, "2025-03-07T15:00:00.000Z", "2025-03-07T16:00:00.000Z"),
+    Price(8.10, "2025-03-07T16:00:00.000Z", "2025-03-07T17:00:00.000Z"),
+    Price(2.00, "2025-03-07T17:00:00.000Z", "2025-03-07T18:00:00.000Z"),  // Only negative value
+    Price(9.54, "2025-03-07T18:00:00.000Z", "2025-03-07T19:00:00.000Z"),
+    Price(4.76, "2025-03-07T19:00:00.000Z", "2025-03-07T20:00:00.000Z"),
+    Price(1.20, "2025-03-07T20:00:00.000Z", "2025-03-07T21:00:00.000Z"),
+    Price(7.32, "2025-03-07T21:00:00.000Z", "2025-03-07T22:00:00.000Z"),
+    Price(3.27, "2025-03-07T22:00:00.000Z", "2025-03-07T23:00:00.000Z"),
+    Price(5.64, "2025-03-07T23:00:00.000Z", "2025-03-08T00:00:00.000Z"),
+
+    // March 8, 2025 (00:00 - 23:00)
+    Price(4.74, "2025-03-08T00:00:00.000Z", "2025-03-08T01:00:00.000Z"),
+    Price(2.45, "2025-03-08T01:00:00.000Z", "2025-03-08T02:00:00.000Z"),
+    Price(6.32, "2025-03-08T02:00:00.000Z", "2025-03-08T03:00:00.000Z"),
+    Price(8.89, "2025-03-08T03:00:00.000Z", "2025-03-08T04:00:00.000Z"),
+    Price(-2.00, "2025-03-08T04:00:00.000Z", "2025-03-08T05:00:00.000Z"),
+    Price(5.54, "2025-03-08T05:00:00.000Z", "2025-03-08T06:00:00.000Z"),
+    Price(7.58, "2025-03-08T06:00:00.000Z", "2025-03-08T07:00:00.000Z"),
+    Price(2.11, "2025-03-08T07:00:00.000Z", "2025-03-08T08:00:00.000Z"),
+    Price(9.33, "2025-03-08T08:00:00.000Z", "2025-03-08T09:00:00.000Z"),
+    Price(4.78, "2025-03-08T09:00:00.000Z", "2025-03-08T10:00:00.000Z"),
+    Price(1.92, "2025-03-08T10:00:00.000Z", "2025-03-08T11:00:00.000Z"),
+    Price(6.05, "2025-03-08T11:00:00.000Z", "2025-03-08T12:00:00.000Z"),
+    Price(3.75, "2025-03-08T12:00:00.000Z", "2025-03-08T13:00:00.000Z"),
+    Price(8.58, "2025-03-08T13:00:00.000Z", "2025-03-08T14:00:00.000Z"),
+    Price(5.76, "2025-03-08T14:00:00.000Z", "2025-03-08T15:00:00.000Z"),
+    Price(2.23, "2025-03-08T15:00:00.000Z", "2025-03-08T16:00:00.000Z"),
+    Price(7.10, "2025-03-08T16:00:00.000Z", "2025-03-08T17:00:00.000Z"),
+    Price(4.11, "2025-03-08T17:00:00.000Z", "2025-03-08T18:00:00.000Z"),
+    Price(9.54, "2025-03-08T18:00:00.000Z", "2025-03-08T19:00:00.000Z"),
+    Price(3.76, "2025-03-08T19:00:00.000Z", "2025-03-08T20:00:00.000Z"),
+    Price(1.00, "2025-03-08T20:00:00.000Z", "2025-03-08T21:00:00.000Z"),
+    Price(6.32, "2025-03-08T21:00:00.000Z", "2025-03-08T22:00:00.000Z"),
+    Price(4.27, "2025-03-08T22:00:00.000Z", "2025-03-08T23:00:00.000Z"),
+    Price(2.64, "2025-03-08T23:00:00.000Z", "2025-03-09T00:00:00.000Z")
 )
 
 class MainActivity : ComponentActivity() {
@@ -399,7 +511,7 @@ fun Page1() {
         coroutineScope.launch {
             try {
                 prices = fetchAndAdjustPrices()
-                //prices = dummyPrices
+                //prices = dummyPrices3
                 loading = false
             } catch (e: Exception) {
                 error = e.message
@@ -511,59 +623,90 @@ fun Page1() {
                 val zonedDateTime = ZonedDateTime.parse(price.startDate)
                 val date = zonedDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                 val time = zonedDateTime.format(DateTimeFormatter.ofPattern("HH.mm"))
-                val priceInCents = String.format("%.2f", price.price)
+                val priceInCents = String.format("%.3f", price.price)
+
+                // Check if this price is for the current hour
+                val currentTime = ZonedDateTime.now()
+                val isCurrentHour = zonedDateTime.hour == currentTime.hour &&
+                        zonedDateTime.dayOfYear == currentTime.dayOfYear &&
+                        zonedDateTime.year == currentTime.year
+
+                // Color based on price range (same logic as bar chart)
+                val priceColor = when {
+                    price.price < 7 -> errorContainerLight
+                    price.price < 14 -> primaryContainerLight
+                    else -> secondaryLight
+                }
+
+                // Background color with appropriate opacity and highlighting for current hour
+                val backgroundColor = if (isCurrentHour) {
+                    priceColor.copy(alpha = 0.7f) // Lighter version for current hour
+                } else {
+                    priceColor.copy(alpha = 0.5f) // Very light tint for non-current hours
+                }
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 4.dp, top = 2.dp, end = 4.dp, bottom = 2.dp)
-                        .clip(RoundedCornerShape(6.dp)),
+                        .clip(RoundedCornerShape(6.dp))
+                        //.background(backgroundColor)
+                        .border(
+                            width = if (isCurrentHour) 4.dp else 0.dp,
+                            color = if (isCurrentHour) priceColor else Color.Transparent,
+                            shape = RoundedCornerShape(6.dp)
+                        )
+                    ,
                     horizontalArrangement = Arrangement.spacedBy(1.dp)
                 ) {
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(backgroundColor)
+                            //.padding(8.dp)
                     ) {
                         Text(
                             text = date,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = if (isCurrentHour) FontWeight.ExtraBold else FontWeight.Normal,
+                            style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .padding(4.dp)
                                 .fillMaxWidth(),
-                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
 
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(backgroundColor)
+                            //.padding(8.dp)
                     ) {
                         Text(
                             text = time,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = if (isCurrentHour) FontWeight.ExtraBold else FontWeight.Normal,
+                            style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .padding(4.dp)
                                 .fillMaxWidth(),
-                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
+
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(backgroundColor)
+                            //.padding(8.dp)
                     ) {
                         Text(
-                            text = priceInCents,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            text = "$priceInCents",
+                            fontWeight = if (isCurrentHour) FontWeight.ExtraBold else FontWeight.Normal,
+                            style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .padding(4.dp)
                                 .fillMaxWidth(),
-                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
@@ -633,17 +776,21 @@ fun BarChart(prices: List<Price>) {
     }.sortedBy { ZonedDateTime.parse(it.startDate) }
     val maxPrice = filteredPrices.maxOfOrNull { it.price } ?: 0.0
     val minPrice = filteredPrices.minOfOrNull { it.price } ?: 0.0
+    val hasNegativeValues = minPrice < 0
+
+    // Adjust minYValue to 0 if all values are positive
+    val minYValue = if (hasNegativeValues) minPrice else 0.0
+    val yRange = (maxPrice - minYValue).coerceAtLeast(0.1) // Ensure non-zero range
+
     var selectedPrice by remember { mutableStateOf<Triple<Double, String, String>?>(null) }
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
     val currentTimeFormatted = currentTime.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy"))
     val currentPrice = filteredPrices.find { ZonedDateTime.parse(it.startDate).hour == currentTime.hour }?.price ?: 0.0
-
-    // Calculate the maximum bar height based on the maximum price
-    val maxBarHeight = (maxPrice - minPrice).toFloat() * 10.dp
 
     Canvas(modifier = Modifier
         .padding(start = 40.dp, top = 16.dp, end = 16.dp, bottom = 32.dp)
         .fillMaxWidth()
-        .height(maxBarHeight)
+        .height(200.dp) // Fixed height for the chart
         .pointerInput(Unit) {
             detectTapGestures { offset ->
                 val gap = 4.dp.toPx()
@@ -655,87 +802,218 @@ fun BarChart(prices: List<Price>) {
                     val time = dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
                     val date = dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                     selectedPrice = Triple(price.price, time, date)
+                    selectedIndex = index
                 }
             }
         }
     ) {
-        val gap = 8.dp.toPx()
+        val gap = 6.dp.toPx()
         val barWidth = (size.width - gap * (filteredPrices.size - 1)) / filteredPrices.size
-        val yAxisInterval = (maxPrice) / 5
         val cornerRadius = 3.dp.toPx()
-        val zeroLine = size.height * (maxPrice / (maxPrice - minPrice)).toFloat()
 
-        // Draw the bars first
-        filteredPrices.forEachIndexed { index, price ->
-            val barHeight = ((price.price / (maxPrice - minPrice)) * size.height).toFloat()
-            val xOffset = index * (barWidth + gap)
-            var barColor = when {
-                price.price < 7 -> errorContainerLight
-                price.price < 14 -> primaryContainerLight
-                else -> secondaryLight
-            }
-
-            // Change the color opacity if the bar corresponds to the current time
-            val priceTime = ZonedDateTime.parse(price.startDate)
-            if (priceTime.hour == currentTime.hour) {
-                barColor = barColor.copy(alpha = 0.6f)
-            }
-
-            // Draw the filled bar with rounded corners
-            drawRoundRect(
-                color = barColor,
-                topLeft = androidx.compose.ui.geometry.Offset(xOffset, zeroLine - barHeight),
-                size = androidx.compose.ui.geometry.Size(barWidth, barHeight),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius, cornerRadius)
-            )
-
-            // Draw a thin border with rounded corners if the bar corresponds to the current time
-            if (priceTime.hour == currentTime.hour) {
-                drawRoundRect(
-                    color = Color.Black,
-                    topLeft = androidx.compose.ui.geometry.Offset(xOffset, zeroLine - barHeight),
-                    size = androidx.compose.ui.geometry.Size(barWidth, barHeight),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius, cornerRadius),
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx())
-                )
-            }
-
-            // Draw x-axis labels centered to the bars
-            drawContext.canvas.nativeCanvas.drawText(
-                ZonedDateTime.parse(price.startDate).format(DateTimeFormatter.ofPattern("HH")),
-                xOffset + barWidth / 2,
-                size.height + 12.sp.toPx(),
-                android.graphics.Paint().apply {
-                    color = android.graphics.Color.BLACK
-                    textAlign = android.graphics.Paint.Align.CENTER
-                    textSize = 12.sp.toPx()
-                }
-            )
+        // Calculate zero Y position
+        val zeroY = if (hasNegativeValues) {
+            // Position zero line proportionally between min and max
+            size.height * (maxPrice / yRange).toFloat()
+        } else {
+            size.height // If no negative values, zero line at bottom
         }
 
-        // Draw y-axis help lines and labels centered to the lines
-        for (i in 0..5) {
-            val y = size.height - ((i * yAxisInterval - minPrice) / (maxPrice - minPrice) * size.height).toFloat()
+        // Draw 8 evenly spaced horizontal grid lines
+        val numLines = 8
+        val yStep = yRange / (numLines - 1)
+
+        for (i in 0 until numLines) {
+            val yValue = minYValue + (i * yStep)
+            val y = size.height - ((yValue - minYValue) / yRange * size.height).toFloat()
+
             drawLine(
                 color = Color.Gray,
                 start = androidx.compose.ui.geometry.Offset(0f, y),
                 end = androidx.compose.ui.geometry.Offset(size.width, y),
                 strokeWidth = 1.dp.toPx()
             )
+
+            // Format Y-axis labels based on value size
             val label = when {
-                0 + i * yAxisInterval == 0.0 -> "0"
-                maxPrice >= 10 -> String.format("%.0f", 0 + i * yAxisInterval)
-                else -> String.format("%.1f", 0 + i * yAxisInterval)
+                abs(yValue) < 0.01 -> "0"
+                abs(yValue) >= 10 -> String.format("%.0f", yValue)
+                else -> String.format("%.1f", yValue)
             }
 
             drawContext.canvas.nativeCanvas.drawText(
                 label,
-                -90f,
-                y + 6.sp.toPx(), // Adjusted to center the label to the line
+                -32f,
+                y + 4.sp.toPx(),
                 android.graphics.Paint().apply {
                     color = android.graphics.Color.BLACK
-                    textAlign = android.graphics.Paint.Align.CENTER
-                    textSize = 12.sp.toPx()
+                    textAlign = android.graphics.Paint.Align.RIGHT
+                    textSize = 10.sp.toPx()
+                }
+            )
+        }
+
+        // Draw zero line more prominently if we have negative values
+        if (hasNegativeValues) {
+            drawLine(
+                color = Color.Black,
+                start = androidx.compose.ui.geometry.Offset(0f, zeroY),
+                end = androidx.compose.ui.geometry.Offset(size.width, zeroY),
+                strokeWidth = 1.5.dp.toPx()
+            )
+        }
+
+        // Draw the bars
+        filteredPrices.forEachIndexed { index, price ->
+            val barHeightPercentage = abs(price.price / yRange).toFloat()
+            val barHeight = barHeightPercentage * size.height
+            val xOffset = index * (barWidth + gap)
+
+            // For positive values, start from zeroY and go up (negative y direction)
+            // For negative values, start from zeroY and go down (positive y direction)
+            // Ensure the bars start exactly at the zero line
+            val topLeft = if (price.price >= 0) {
+                // For positive values, start exactly from zeroY
+                androidx.compose.ui.geometry.Offset(xOffset, zeroY - barHeight)
+            } else {
+                // For negative values, start exactly from zeroY
+                androidx.compose.ui.geometry.Offset(xOffset, zeroY)
+            }
+
+            // Ensure minimum bar height for visibility when values are very close to zero
+            val minBarHeight = 1f.dp.toPx()
+            val actualBarHeight = barHeight.coerceAtLeast(minBarHeight)
+
+            val barColor = when {
+                price.price < 7 -> errorContainerLight
+                price.price < 14 -> primaryContainerLight
+                else -> secondaryLight
+            }
+
+            // Change color opacity for current hour
+            val priceTime = ZonedDateTime.parse(price.startDate)
+//            if (priceTime.hour == currentTime.hour) {
+//                barColor = barColor.copy(alpha = 0.6f)
+//            }
+
+            // Draw the bar
+            drawRoundRect(
+                color = barColor.copy(alpha = 0.9f),
+                topLeft = topLeft,
+                size = androidx.compose.ui.geometry.Size(
+                    barWidth,
+                    // Fix: For negative values, bars go down from zero line
+                    if (price.price >= 0) actualBarHeight else actualBarHeight
+                ),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius, cornerRadius)
+            )
+
+//            // Draw border for current hour
+//            if (priceTime.hour == currentTime.hour) {
+//                drawRoundRect(
+//                    color = Color.Black,
+//                    topLeft = topLeft,
+//                    size = androidx.compose.ui.geometry.Size(barWidth, actualBarHeight),
+//                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadius, cornerRadius),
+//                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx())
+//                )
+//            }
+
+            // Draw x-axis labels
+            val isCurrentHour = priceTime.hour == currentTime.hour
+            val hourText = ZonedDateTime.parse(price.startDate).format(DateTimeFormatter.ofPattern("HH"))
+            val isSelectedHour = selectedIndex == index
+            val textPaint = android.graphics.Paint().apply {
+                color = android.graphics.Color.BLACK
+                textAlign = android.graphics.Paint.Align.CENTER
+                textSize = 12.sp.toPx()
+                if (isSelectedHour) {
+                    isFakeBoldText = true // Make text bold for current hour
+                }
+            }
+
+            // Draw indicator line for selected hour label
+            if (isSelectedHour) {
+                // Draw vertical indicator line for current hour
+                drawLine(
+                    color = scrimLight.copy(alpha = 0.5f),
+                    start = androidx.compose.ui.geometry.Offset(xOffset + barWidth / 2, 0f),
+                    end = androidx.compose.ui.geometry.Offset(xOffset + barWidth / 2, size.height),
+                    strokeWidth = 1.5.dp.toPx()
+                )
+
+//                // Draw background for current hour label
+//                val textWidth = textPaint.measureText("00") // Approximate width
+//                val labelBgRect = android.graphics.RectF(
+//                    xOffset + barWidth / 2 - textWidth / 2 - 4.dp.toPx(),
+//                    size.height + 2.sp.toPx(),
+//                    xOffset + barWidth / 2 + textWidth / 2 + 4.dp.toPx(),
+//                    size.height + 22.sp.toPx()
+//                )
+//                // Convert the Compose Color to Android Color with same alpha
+//                val androidColor = android.graphics.Color.argb(
+//                    (barColor.alpha * 0.5f * 255).toInt(),
+//                    (barColor.red * 255).toInt(),
+//                    (barColor.green * 255).toInt(),
+//                    (barColor.blue * 255).toInt()
+//                )
+//
+//                drawContext.canvas.nativeCanvas.drawRoundRect(
+//                    labelBgRect,
+//                    4.dp.toPx(), 4.dp.toPx(),
+//                    android.graphics.Paint().apply {
+//                        color = androidColor
+//                        style = android.graphics.Paint.Style.FILL
+//                    }
+//                )
+            }
+
+            // Draw indicators for current hour label
+            if (isCurrentHour) {
+//                // Draw vertical indicator line for current hour
+//                drawLine(
+//                    color = barColor.copy(alpha = 0.5f),
+//                    start = androidx.compose.ui.geometry.Offset(xOffset + barWidth / 2, 0f),
+//                    end = androidx.compose.ui.geometry.Offset(xOffset + barWidth / 2, size.height),
+//                    strokeWidth = 1.5.dp.toPx()
+//                )
+
+                // Draw background for current hour label
+                val textWidth = textPaint.measureText("00") // Approximate width
+                val labelBgRect = android.graphics.RectF(
+                    xOffset + barWidth / 2 - textWidth / 2 - 4.dp.toPx(),
+                    size.height + 2.sp.toPx(),
+                    xOffset + barWidth / 2 + textWidth / 2 + 4.dp.toPx(),
+                    size.height + 22.sp.toPx()
+                )
+                // Convert the Compose Color to Android Color with same alpha
+                val androidColor = android.graphics.Color.argb(
+                    (barColor.alpha * 0.5f * 255).toInt(),
+                    (barColor.red * 255).toInt(),
+                    (barColor.green * 255).toInt(),
+                    (barColor.blue * 255).toInt()
+                )
+
+                drawContext.canvas.nativeCanvas.drawRoundRect(
+                    labelBgRect,
+                    4.dp.toPx(), 4.dp.toPx(),
+                    android.graphics.Paint().apply {
+                        color = androidColor
+                        style = android.graphics.Paint.Style.FILL
+                    }
+                )
+            }
+
+            // Draw the hour label
+            //val hourText = ZonedDateTime.parse(price.startDate).format(DateTimeFormatter.ofPattern("HH"))
+            drawContext.canvas.nativeCanvas.drawText(
+                hourText,
+                xOffset + barWidth / 2,
+                size.height + 16.sp.toPx(),
+                textPaint.apply {
+//                    if (isCurrentHour) {
+//                        color = android.graphics.Color.WHITE
+//                    }
                 }
             )
         }
@@ -745,16 +1023,14 @@ fun BarChart(prices: List<Price>) {
 
     Box(
         modifier = Modifier
-            .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
-        ,
+            .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = selectedPrice?.let { (price, time, date) ->
-                stringResource(R.string.selected_spot_cents_kwh, time, date, price)
-            } ?: stringResource(R.string.current_spot_cents_kwh, currentTimeFormatted, currentPrice),
-            modifier = Modifier
-                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
+                stringResource(R.string.selected_spot_cents_kwh, time, date, String.format("%.2f", price))
+            } ?: stringResource(R.string.current_spot_cents_kwh, currentTimeFormatted, String.format("%.2f", currentPrice)),
+            modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
@@ -838,7 +1114,7 @@ fun Page2( viewModel: Page2ViewModel = viewModel()) {
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(64.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
 
         item {
@@ -1048,6 +1324,10 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
         cameraPermissionGranted.value = isGranted
     }
 
+    LaunchedEffect(userName) {
+        localUserName = userName
+    }
+
     LaunchedEffect(Unit, recomposeTrigger) {
         if (!cameraPermissionGranted.value) {
             permissionLauncher.launch(Manifest.permission.CAMERA)
@@ -1113,7 +1393,7 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
                     modifier = Modifier.padding(16.dp)
                 )
                 val keyboardController = LocalSoftwareKeyboardController.current
-                TextField(
+                OutlinedTextField(
                     value = localUserName,
                     onValueChange = { newValue ->
                         val filteredValue = newValue.replace("\n", "")

@@ -31,9 +31,9 @@
     <string name="monthly_cost">"\nMonthly Cost: "</string>
     <string name="loading_price_data">Loading price data...</string>
     <string name="recent_spot_price">Spot price</string>
-    <string name="average_price_from_past_few_days">"Average price recently: "</string>
+    <string name="average_price_from_past_few_days">"Average price recently (48 Hrs.): "</string>
     <string name="cents_kwh"> cent/kWh\n</string>
-    <string name="average_yearly_cost">"\nAverage Yearly Cost: "</string>
+    <string name="average_yearly_cost">"\n\nAverage Yearly Cost: "</string>
     <string name="average_monthly_cost">"\nAverage Monthly Cost: "</string>
     <string name="input_your_consumption_to_calculate_average_costs">\nInput your yearly consumption to calculate average costs.</string>
     <string name="not">Not %1$s?</string>

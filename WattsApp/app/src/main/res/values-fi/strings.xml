@@ -24,7 +24,7 @@
     <string name="selected_spot_cents_kwh">Valittu tunti: %1$s %2$s\n%3$s snt/kWh</string>
     <string name="current_spot_cents_kwh">Kuluva tunti: %1$s\n%2$s snt/kWh</string>
     <string name="energy_consumption_kwh_year">Vuosikulutus (kWh)</string>
-    <string name="fixed_price_cents_kwh">Sähkön hinta (snt/kWh)</string>
+    <string name="fixed_price_cents_kwh">Kiinteä sähkön hinta (snt/kWh)</string>
     <string name="fixed_price_title">Kiinteä hinta</string>
     <string name="input_both_values_to_calculate">Syötä vuosikulutus ja sähkön hinta</string>
     <string name="invalid_input_values">Virheellinen syöte</string>
@@ -32,10 +32,10 @@
     <string name="monthly_cost">"\nKuukausikustannus: "</string>
     <string name="loading_price_data">Ladataan hintatietoja...</string>
     <string name="recent_spot_price">Spot-hinta</string>
-    <string name="average_price_from_past_few_days">"Viimeaikainen spot-keskihinta: "</string>
+    <string name="average_price_from_past_few_days">"Viimeaikainen (48 tuntia) spot-keskihinta: "</string>
     <string name="cents_kwh">snt/kWh</string>
-    <string name="average_yearly_cost">"\n\nArvio vuosikustannuksista: "</string>
-    <string name="average_monthly_cost">"\nArvio kuukausikustannuksista: "</string>
+    <string name="average_yearly_cost">"\n\nVuosikustannusarvio: "</string>
+    <string name="average_monthly_cost">"\nKuukausikustannusarvio: "</string>
     <string name="input_your_consumption_to_calculate_average_costs">\n\nSyötä vuosikulutuksesi laskeaksesi kulutusarvio.</string>
     <string name="not">Etkö ole %1$s?</string>
     <string name="delete_user_name">Poista käyttäjänimi</string>
