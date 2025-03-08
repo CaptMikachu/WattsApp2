@@ -204,14 +204,29 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WattsAppTheme {
-                var userName by remember { mutableStateOf(sharedPreferences.getString("user_name", "") ?: "") } // Read the user name from the shared preferences
+                // Read the user name from the shared preferences
+                var userName by remember { mutableStateOf(sharedPreferences.getString("user_name", "") ?: "") }
+
+                // Add imageUri state at this level
+                val savedImageUri = sharedPreferences.getString("image_uri", null)
+                var imageUri by remember { mutableStateOf<Uri?>(savedImageUri?.let { Uri.parse(it) }) }
 
                 WattsApp(
                     sharedPreferences = sharedPreferences,
                     userName = userName,
-                    onUserNameChange = { newUserName -> // Update the user name
+                    imageUri = imageUri,
+                    onUserNameChange = { newUserName ->
                         userName = newUserName
                         sharedPreferences.edit().putString("user_name", newUserName).apply()
+                    },
+                    onImageUriChange = { newUri ->
+                        imageUri = newUri
+                        // Save to SharedPreferences
+                        if (newUri != null) {
+                            sharedPreferences.edit().putString("image_uri", newUri.toString()).apply()
+                        } else {
+                            sharedPreferences.edit().remove("image_uri").apply()
+                        }
                     }
                 )
             }
@@ -221,12 +236,18 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun WattsApp(sharedPreferences: SharedPreferences, userName: String, onUserNameChange: (String) -> Unit) {
+fun WattsApp(
+    sharedPreferences: SharedPreferences,
+    userName: String,
+    imageUri: Uri?,
+    onUserNameChange: (String) -> Unit,
+    onImageUriChange: (Uri?) -> Unit
+) {
     val navController = rememberNavController()
 
     Scaffold(
         topBar = {
-            TopBar(navController, sharedPreferences)
+            TopBar(navController, userName, imageUri/*, sharedPreferences*/)
         },
         bottomBar = {
             BottomNavigationBar(navController = navController)
@@ -247,7 +268,7 @@ fun WattsApp(sharedPreferences: SharedPreferences, userName: String, onUserNameC
                     Page3()
                 }
                 composable("page4") {// User
-                    Page4( userName, onUserNameChange)
+                    Page4(userName, imageUri, onUserNameChange, onImageUriChange)
                 }
             }
         }
@@ -257,7 +278,11 @@ fun WattsApp(sharedPreferences: SharedPreferences, userName: String, onUserNameC
 // Top app bar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavHostController, sharedPreferences: SharedPreferences) {
+fun TopBar(
+    navController: NavHostController,
+    userName: String,
+    imageUri: Uri?
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val context = LocalContext.current
@@ -270,11 +295,11 @@ fun TopBar(navController: NavHostController, sharedPreferences: SharedPreference
         else -> stringResource(R.string.app_name)
     }
 
-    val userName = sharedPreferences.getString("user_name", "") ?: ""
-    val imageUriString = sharedPreferences.getString("image_uri", null)
-    val imageUri = remember(imageUriString) {
-        imageUriString?.let { Uri.parse(it) }
-    }
+//    val userName = sharedPreferences.getString("user_name", "") ?: ""
+//    val imageUriString = sharedPreferences.getString("image_uri", null)
+//    val imageUri = remember(imageUriString) {
+//        imageUriString?.let { Uri.parse(it) }
+//    }
 
     TopAppBar(
         title = {
@@ -534,8 +559,10 @@ fun Page1() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp)
-                        .clip(RoundedCornerShape(6.dp)),
+                        //.padding(4.dp)
+                        .padding(start = 4.dp, top = 4.dp, end = 4.dp, bottom = 8.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .border(3.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(6.dp)),
                     horizontalArrangement = Arrangement.spacedBy(1.dp)
                 ) {
                     Box(
@@ -1296,10 +1323,15 @@ fun Page3() {
 
 // Fourth page for adding user name
 @Composable
-fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
+fun Page4(
+    userName: String,
+    imageUri: Uri?,
+    onUserNameChange: (String) -> Unit,
+    onImageUriChange: (Uri?) -> Unit
+) {
     var localUserName by remember { mutableStateOf(userName) }
     var errorMessage by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    //var imageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
@@ -1312,15 +1344,16 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
             ) == PackageManager.PERMISSION_GRANTED
         )
     }
-    var recomposeTrigger by remember { mutableStateOf(false) }
+    //var recomposeTrigger by remember { mutableStateOf(false) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
             tempCameraUri?.let { uri ->
-                imageUri = uri  // Only set imageUri on success
-                sharedPreferences.edit().putString("image_uri", uri.toString()).apply()
+                //imageUri = uri  // Only set imageUri on success
+                //sharedPreferences.edit().putString("image_uri", uri.toString()).apply()
+                onImageUriChange(uri)  // Update shared state
             }
         }
         // Clear temp URI whether successful or not
@@ -1337,21 +1370,21 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
         localUserName = userName
     }
 
-    LaunchedEffect(Unit, recomposeTrigger) {
+    LaunchedEffect(Unit/*, recomposeTrigger*/) {
         if (!cameraPermissionGranted.value) {
             permissionLauncher.launch(Manifest.permission.CAMERA)
         }
-        val savedUri = sharedPreferences.getString("image_uri", null)
-        if (savedUri != null) {
-            imageUri = Uri.parse(savedUri)
-        }
+//        val savedUri = sharedPreferences.getString("image_uri", null)
+//        if (savedUri != null) {
+//            imageUri = Uri.parse(savedUri)
+//        }
     }
 
-    LaunchedEffect(imageUri) {
-        imageUri?.let { uri ->
-            sharedPreferences.edit().putString("image_uri", uri.toString()).apply()
-        }
-    }
+//    LaunchedEffect(imageUri) {
+//        imageUri?.let { uri ->
+//            sharedPreferences.edit().putString("image_uri", uri.toString()).apply()
+//        }
+//    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -1446,7 +1479,7 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                imageUri = null  // Reset imageUri to prevent flashing the old image
+                //imageUri = null  // Reset imageUri to prevent flashing the old image
                 val photoFile = File(context.filesDir, "photo.jpg")
                 val photoUri = FileProvider.getUriForFile(
                     context,
@@ -1460,6 +1493,8 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
+
+        // Display current image
         item {
             Box(
                 modifier = Modifier
@@ -1494,8 +1529,9 @@ fun Page4(userName: String, onUserNameChange: (String) -> Unit) {
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                imageUri = null
-                sharedPreferences.edit().remove("image_uri").apply()
+//                imageUri = null
+//                sharedPreferences.edit().remove("image_uri").apply()
+                onImageUriChange(null)  // Clear image through callback
             }) {
                 Text(stringResource(R.string.delete_pic_button))
             }
