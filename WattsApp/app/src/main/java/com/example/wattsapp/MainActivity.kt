@@ -295,6 +295,14 @@ fun TopBar(
         else -> stringResource(R.string.app_name)
     }
 
+    // Unique key that changes whenever imageUri changes - using URI string + timestamp
+    val imageKey = remember { mutableStateOf(System.currentTimeMillis()) }
+
+    // Update the key whenever imageUri changes
+    LaunchedEffect(imageUri) {
+        imageKey.value = System.currentTimeMillis()
+    }
+
 //    val userName = sharedPreferences.getString("user_name", "") ?: ""
 //    val imageUriString = sharedPreferences.getString("image_uri", null)
 //    val imageUri = remember(imageUriString) {
@@ -323,9 +331,11 @@ fun TopBar(
                         //.background(MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.2f))
                 ) {
                     if (imageUri != null) {
-                        // Load bitmap separately from composable functions
-                        val bitmap = remember(imageUri) {
+                        // Force bitmap to reload using the dynamic key
+                        val bitmap = remember(imageUri, imageKey.value) {
                             try {
+                                // Clear any cached data for this URI
+                                context.contentResolver.notifyChange(imageUri, null)
                                 MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
                             } catch (e: Exception) {
                                 null
@@ -1480,7 +1490,9 @@ fun Page4(
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
                 //imageUri = null  // Reset imageUri to prevent flashing the old image
-                val photoFile = File(context.filesDir, "photo.jpg")
+                // Create a unique filename with timestamp
+                val timestamp = System.currentTimeMillis()
+                val photoFile = File(context.filesDir, "photo_${timestamp}.jpg")
                 val photoUri = FileProvider.getUriForFile(
                     context,
                     "${context.packageName}.provider",
