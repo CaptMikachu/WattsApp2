@@ -48,4 +48,5 @@
     <string name="take_pic_button">Uusi Profiilikuva</string>
     <string name="delete_pic_button">Poista Kuva</string>
     <string name="update_pic_button">Päivitä Kuva</string>
+    <string name="rotate_image">Käännä kuvaa</string>
 </resources>

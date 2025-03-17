@@ -47,4 +47,5 @@
     <string name="take_pic_button">Take Profile Picture</string>
     <string name="delete_pic_button">Delete Picture</string>
     <string name="update_pic_button">Update Profile picture</string>
+    <string name="rotate_image">Rotate image</string>
 </resources>

@@ -96,6 +96,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -210,11 +211,13 @@ class MainActivity : ComponentActivity() {
                 // Add imageUri state at this level
                 val savedImageUri = sharedPreferences.getString("image_uri", null)
                 var imageUri by remember { mutableStateOf<Uri?>(savedImageUri?.let { Uri.parse(it) }) }
+                var imageRotation by remember { mutableStateOf(sharedPreferences.getInt("image_rotation", 0)) }
 
                 WattsApp(
                     sharedPreferences = sharedPreferences,
                     userName = userName,
                     imageUri = imageUri,
+                    imageRotation = imageRotation,
                     onUserNameChange = { newUserName ->
                         userName = newUserName
                         sharedPreferences.edit().putString("user_name", newUserName).apply()
@@ -227,6 +230,10 @@ class MainActivity : ComponentActivity() {
                         } else {
                             sharedPreferences.edit().remove("image_uri").apply()
                         }
+                    },
+                    onImageRotationChange = { newRotation ->
+                        imageRotation = newRotation
+                        sharedPreferences.edit().putInt("image_rotation", newRotation).apply()
                     }
                 )
             }
@@ -240,14 +247,16 @@ fun WattsApp(
     sharedPreferences: SharedPreferences,
     userName: String,
     imageUri: Uri?,
+    imageRotation: Int,
     onUserNameChange: (String) -> Unit,
-    onImageUriChange: (Uri?) -> Unit
+    onImageUriChange: (Uri?) -> Unit,
+    onImageRotationChange: (Int) -> Unit
 ) {
     val navController = rememberNavController()
 
     Scaffold(
         topBar = {
-            TopBar(navController, userName, imageUri/*, sharedPreferences*/)
+            TopBar(navController, userName, imageUri, imageRotation)
         },
         bottomBar = {
             BottomNavigationBar(navController = navController)
@@ -268,7 +277,13 @@ fun WattsApp(
                     Page3()
                 }
                 composable("page4") {// User
-                    Page4(userName, imageUri, onUserNameChange, onImageUriChange)
+                    Page4(
+                        userName,
+                        imageUri,
+                        imageRotation,
+                        onUserNameChange,
+                        onImageUriChange,
+                        onImageRotationChange)
                 }
             }
         }
@@ -281,7 +296,8 @@ fun WattsApp(
 fun TopBar(
     navController: NavHostController,
     userName: String,
-    imageUri: Uri?
+    imageUri: Uri?,
+    imageRotation: Int
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -351,7 +367,7 @@ fun TopBar(
                                     .size(24.dp)
                                     //.size(if (userName.length > 6) 12.dp else 24.dp)
                                     .clip(CircleShape)
-                                    .rotate(90f)
+                                    .rotate(90f + imageRotation.toFloat()) // Apply custom rotation
                                     .align(Alignment.CenterHorizontally),
                                 contentScale = ContentScale.Crop
                             )
@@ -1336,8 +1352,10 @@ fun Page3() {
 fun Page4(
     userName: String,
     imageUri: Uri?,
+    imageRotation: Int,
     onUserNameChange: (String) -> Unit,
-    onImageUriChange: (Uri?) -> Unit
+    onImageUriChange: (Uri?) -> Unit,
+    onImageRotationChange: (Int) -> Unit
 ) {
     var localUserName by remember { mutableStateOf(userName) }
     var errorMessage by remember { mutableStateOf("") }
@@ -1401,7 +1419,7 @@ fun Page4(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            Spacer(modifier = Modifier.padding(20.dp))
+            Spacer(modifier = Modifier.padding(5.dp))
             if (userName.isNotEmpty()) {
                 Text(
                     text = stringResource(R.string.not, userName),
@@ -1522,7 +1540,7 @@ fun Page4(
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxSize()
-                            .rotate(90f),
+                            .rotate(90f + imageRotation.toFloat()), // Apply custom rotation
                         contentScale = ContentScale.Crop
                     )
                 }
@@ -1537,6 +1555,23 @@ fun Page4(
 //                Text(stringResource(R.string.update_pic_button))
 //            }
 //        }
+
+        // Pic rotation button
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                // Add 90 degrees to current rotation and normalize to 0-359
+                val newRotation = (imageRotation + 90) % 360
+                onImageRotationChange(newRotation)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Refresh, // Using built-in Material icon
+                    contentDescription = "Rotate Image",
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(stringResource(R.string.rotate_image))
+            }
+        }
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
