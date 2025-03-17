@@ -1,5 +1,6 @@
 package com.example.wattsapp
 
+import android.content.pm.ActivityInfo
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -114,91 +115,107 @@ import java.io.File
 import java.time.ZoneId
 import kotlin.math.abs
 
+import android.util.Log
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.camera.core.*
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.compose.ui.viewinterop.AndroidView
+//import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalLifecycleOwner
+//import com.google.accompanist.permissions.ExperimentalPermissionsApi
+//import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import android.view.Surface
+import androidx.compose.material.icons.filled.Close
+
 
 const val BASE_URL = "https://api.porssisahko.net/"
 const val LATEST_PRICES_ENDPOINT = "v1/latest-prices.json"
 const val API_MAIN_PAGE_URL = "https://www.porssisahko.net/api"
 
 
-val dummyPrices = listOf(
-    Price(5.874, "2025-03-08T00:00:00.000Z", "2025-03-08T01:00:00.000Z"),
-    Price(9.457, "2025-03-08T01:00:00.000Z", "2025-03-08T02:00:00.000Z"),
-    Price(0.2, "2025-03-08T02:00:00.000Z", "2025-03-08T03:00:00.000Z"),
-    Price(10.899, "2025-03-08T03:00:00.000Z", "2025-03-08T04:00:00.000Z"),
-    Price(3.172, "2025-03-08T04:00:00.000Z", "2025-03-08T05:00:00.000Z"),
-    Price(11.0, "2025-03-08T05:00:00.000Z", "2025-03-08T06:00:00.000Z"),
-    Price(0.2, "2025-03-08T06:00:00.000Z", "2025-03-08T07:00:00.000Z"),
-    Price(9.113, "2025-03-08T07:00:00.000Z", "2025-03-08T08:00:00.000Z"),
-    Price(3.533, "2025-03-08T08:00:00.000Z", "2025-03-08T09:00:00.000Z"),
-    Price(3.533, "2025-03-08T09:00:00.000Z", "2025-03-08T10:00:00.000Z"),
-    Price(-26.333, "2025-03-08T10:00:00.000Z", "2025-03-08T11:00:00.000Z"),
-    Price(0.0, "2025-03-08T11:00:00.000Z", "2025-03-08T12:00:00.000Z"),
-    Price(8.757, "2025-03-08T12:00:00.000Z", "2025-03-08T13:00:00.000Z"),
-    Price(-10.58, "2025-03-08T13:00:00.000Z", "2025-03-08T14:00:00.000Z"),
-    Price(14.761, "2025-03-08T14:00:00.000Z", "2025-03-08T15:00:00.000Z"),
-    Price(0.0, "2025-03-08T15:00:00.000Z", "2025-03-08T16:00:00.000Z"),
-    Price(25.104, "2025-03-08T16:00:00.000Z", "2025-03-08T17:00:00.000Z"),
-    Price(-128.118, "2025-03-08T17:00:00.000Z", "2025-03-08T18:00:00.000Z"),
-    Price(20.541, "2025-03-08T18:00:00.000Z", "2025-03-08T19:00:00.000Z"),
-    Price(14.761, "2025-03-08T19:00:00.000Z", "2025-03-08T20:00:00.000Z"),
-    Price(0.0, "2025-03-08T20:00:00.000Z", "2025-03-08T21:00:00.000Z"),
-    Price(25.104, "2025-03-08T21:00:00.000Z", "2025-03-08T22:00:00.000Z"),
-    Price(-28.118, "2025-03-08T22:00:00.000Z", "2025-03-08T23:00:00.000Z"),
-    Price(20.541, "2025-03-08T23:00:00.000Z", "2025-03-09T00:00:00.000Z"),
-    Price(3.85, "2025-03-09T00:00:00.000Z", "2025-03-09T01:00:00.000Z"),
-    Price(4.72, "2025-03-09T01:00:00.000Z", "2025-03-09T02:00:00.000Z"),
-    Price(3.45, "2025-03-09T02:00:00.000Z", "2025-03-09T03:00:00.000Z"),
-    Price(5.03, "2025-03-09T03:00:00.000Z", "2025-03-09T04:00:00.000Z"),
-    Price(3.62, "2025-03-09T04:00:00.000Z", "2025-03-09T05:00:00.000Z"),
-    Price(5.2, "2025-03-09T05:00:00.000Z", "2025-03-09T06:00:00.000Z"),
-    Price(3.45, "2025-03-09T06:00:00.000Z", "2025-03-09T07:00:00.000Z"),
-    Price(4.64, "2025-03-09T07:00:00.000Z", "2025-03-09T08:00:00.000Z"),
-    Price(3.85, "2025-03-09T08:00:00.000Z", "2025-03-09T09:00:00.000Z"),
-    Price(3.85, "2025-03-09T09:00:00.000Z", "2025-03-09T10:00:00.000Z"),
-    Price(3.45, "2025-03-09T10:00:00.000Z", "2025-03-09T11:00:00.000Z"),
-    Price(3.45, "2025-03-09T11:00:00.000Z", "2025-03-09T12:00:00.000Z"),
-    Price(4.38, "2025-03-09T12:00:00.000Z", "2025-03-09T13:00:00.000Z"),
-    Price(3.45, "2025-03-09T13:00:00.000Z", "2025-03-09T14:00:00.000Z"),
-    Price(4.92, "2025-03-09T14:00:00.000Z", "2025-03-09T15:00:00.000Z"),
-    Price(3.45, "2025-03-09T15:00:00.000Z", "2025-03-09T16:00:00.000Z"),
-    Price(5.08, "2025-03-09T16:00:00.000Z", "2025-03-09T17:00:00.000Z"),
-    Price(3.45, "2025-03-09T17:00:00.000Z", "2025-03-09T18:00:00.000Z"),
-    Price(4.85, "2025-03-09T18:00:00.000Z", "2025-03-09T19:00:00.000Z"),
-    Price(4.92, "2025-03-09T19:00:00.000Z", "2025-03-09T20:00:00.000Z"),
-    Price(3.45, "2025-03-09T20:00:00.000Z", "2025-03-09T21:00:00.000Z"),
-    Price(5.08, "2025-03-09T21:00:00.000Z", "2025-03-09T22:00:00.000Z"),
-    Price(3.45, "2025-03-09T22:00:00.000Z", "2025-03-09T23:00:00.000Z"),
-    Price(4.85, "2025-03-09T23:00:00.000Z", "2025-03-10T00:00:00.000Z"),
-    Price(15.74, "2025-03-10T00:00:00.000Z", "2025-03-10T01:00:00.000Z"),
-    Price(-9.45, "2025-03-10T01:00:00.000Z", "2025-03-10T02:00:00.000Z"),
-    Price(7.32, "2025-03-10T02:00:00.000Z", "2025-03-10T03:00:00.000Z"),
-    Price(-12.89, "2025-03-10T03:00:00.000Z", "2025-03-10T04:00:00.000Z"),
-    Price(3.17, "2025-03-10T04:00:00.000Z", "2025-03-10T05:00:00.000Z"),
-    Price(0.54, "2025-03-10T05:00:00.000Z", "2025-03-10T06:00:00.000Z"),
-    Price(-20.58, "2025-03-10T06:00:00.000Z", "2025-03-10T07:00:00.000Z"),
-    Price(9.11, "2025-03-10T07:00:00.000Z", "2025-03-10T08:00:00.000Z"),
-    Price(-15.33, "2025-03-10T08:00:00.000Z", "2025-03-10T09:00:00.000Z"),
-    Price(6.78, "2025-03-10T09:00:00.000Z", "2025-03-10T10:00:00.000Z"),
-    Price(-8.92, "2025-03-10T10:00:00.000Z", "2025-03-10T11:00:00.000Z"),
-    Price(0.05, "2025-03-10T11:00:00.000Z", "2025-03-10T12:00:00.000Z"),
-    Price(10.75, "2025-03-10T12:00:00.000Z", "2025-03-10T13:00:00.000Z"),
-    Price(-18.58, "2025-03-10T13:00:00.000Z", "2025-03-10T14:00:00.000Z"),
-    Price(14.76, "2025-03-10T14:00:00.000Z", "2025-03-10T15:00:00.000Z"),
-    Price(-5.23, "2025-03-10T15:00:00.000Z", "2025-03-10T16:00:00.000Z"),
-    Price(25.10, "2025-03-10T16:00:00.000Z", "2025-03-10T17:00:00.000Z"),
-    Price(-30.11, "2025-03-10T17:00:00.000Z", "2025-03-10T18:00:00.000Z"),
-    Price(20.54, "2025-03-10T18:00:00.000Z", "2025-03-10T19:00:00.000Z"),
-    Price(-24.76, "2025-03-10T19:00:00.000Z", "2025-03-10T20:00:00.000Z"),
-    Price(0.00, "2025-03-10T20:00:00.000Z", "2025-03-10T21:00:00.000Z"),
-    Price(17.32, "2025-03-10T21:00:00.000Z", "2025-03-10T22:00:00.000Z"),
-    Price(-14.27, "2025-03-10T22:00:00.000Z", "2025-03-10T23:00:00.000Z")
-)
+//val dummyPrices = listOf(
+//    Price(5.874, "2025-03-08T00:00:00.000Z", "2025-03-08T01:00:00.000Z"),
+//    Price(9.457, "2025-03-08T01:00:00.000Z", "2025-03-08T02:00:00.000Z"),
+//    Price(0.2, "2025-03-08T02:00:00.000Z", "2025-03-08T03:00:00.000Z"),
+//    Price(10.899, "2025-03-08T03:00:00.000Z", "2025-03-08T04:00:00.000Z"),
+//    Price(3.172, "2025-03-08T04:00:00.000Z", "2025-03-08T05:00:00.000Z"),
+//    Price(11.0, "2025-03-08T05:00:00.000Z", "2025-03-08T06:00:00.000Z"),
+//    Price(0.2, "2025-03-08T06:00:00.000Z", "2025-03-08T07:00:00.000Z"),
+//    Price(9.113, "2025-03-08T07:00:00.000Z", "2025-03-08T08:00:00.000Z"),
+//    Price(3.533, "2025-03-08T08:00:00.000Z", "2025-03-08T09:00:00.000Z"),
+//    Price(3.533, "2025-03-08T09:00:00.000Z", "2025-03-08T10:00:00.000Z"),
+//    Price(-26.333, "2025-03-08T10:00:00.000Z", "2025-03-08T11:00:00.000Z"),
+//    Price(0.0, "2025-03-08T11:00:00.000Z", "2025-03-08T12:00:00.000Z"),
+//    Price(8.757, "2025-03-08T12:00:00.000Z", "2025-03-08T13:00:00.000Z"),
+//    Price(-10.58, "2025-03-08T13:00:00.000Z", "2025-03-08T14:00:00.000Z"),
+//    Price(14.761, "2025-03-08T14:00:00.000Z", "2025-03-08T15:00:00.000Z"),
+//    Price(0.0, "2025-03-08T15:00:00.000Z", "2025-03-08T16:00:00.000Z"),
+//    Price(25.104, "2025-03-08T16:00:00.000Z", "2025-03-08T17:00:00.000Z"),
+//    Price(-128.118, "2025-03-08T17:00:00.000Z", "2025-03-08T18:00:00.000Z"),
+//    Price(20.541, "2025-03-08T18:00:00.000Z", "2025-03-08T19:00:00.000Z"),
+//    Price(14.761, "2025-03-08T19:00:00.000Z", "2025-03-08T20:00:00.000Z"),
+//    Price(0.0, "2025-03-08T20:00:00.000Z", "2025-03-08T21:00:00.000Z"),
+//    Price(25.104, "2025-03-08T21:00:00.000Z", "2025-03-08T22:00:00.000Z"),
+//    Price(-28.118, "2025-03-08T22:00:00.000Z", "2025-03-08T23:00:00.000Z"),
+//    Price(20.541, "2025-03-08T23:00:00.000Z", "2025-03-09T00:00:00.000Z"),
+//    Price(3.85, "2025-03-09T00:00:00.000Z", "2025-03-09T01:00:00.000Z"),
+//    Price(4.72, "2025-03-09T01:00:00.000Z", "2025-03-09T02:00:00.000Z"),
+//    Price(3.45, "2025-03-09T02:00:00.000Z", "2025-03-09T03:00:00.000Z"),
+//    Price(5.03, "2025-03-09T03:00:00.000Z", "2025-03-09T04:00:00.000Z"),
+//    Price(3.62, "2025-03-09T04:00:00.000Z", "2025-03-09T05:00:00.000Z"),
+//    Price(5.2, "2025-03-09T05:00:00.000Z", "2025-03-09T06:00:00.000Z"),
+//    Price(3.45, "2025-03-09T06:00:00.000Z", "2025-03-09T07:00:00.000Z"),
+//    Price(4.64, "2025-03-09T07:00:00.000Z", "2025-03-09T08:00:00.000Z"),
+//    Price(3.85, "2025-03-09T08:00:00.000Z", "2025-03-09T09:00:00.000Z"),
+//    Price(3.85, "2025-03-09T09:00:00.000Z", "2025-03-09T10:00:00.000Z"),
+//    Price(3.45, "2025-03-09T10:00:00.000Z", "2025-03-09T11:00:00.000Z"),
+//    Price(3.45, "2025-03-09T11:00:00.000Z", "2025-03-09T12:00:00.000Z"),
+//    Price(4.38, "2025-03-09T12:00:00.000Z", "2025-03-09T13:00:00.000Z"),
+//    Price(3.45, "2025-03-09T13:00:00.000Z", "2025-03-09T14:00:00.000Z"),
+//    Price(4.92, "2025-03-09T14:00:00.000Z", "2025-03-09T15:00:00.000Z"),
+//    Price(3.45, "2025-03-09T15:00:00.000Z", "2025-03-09T16:00:00.000Z"),
+//    Price(5.08, "2025-03-09T16:00:00.000Z", "2025-03-09T17:00:00.000Z"),
+//    Price(3.45, "2025-03-09T17:00:00.000Z", "2025-03-09T18:00:00.000Z"),
+//    Price(4.85, "2025-03-09T18:00:00.000Z", "2025-03-09T19:00:00.000Z"),
+//    Price(4.92, "2025-03-09T19:00:00.000Z", "2025-03-09T20:00:00.000Z"),
+//    Price(3.45, "2025-03-09T20:00:00.000Z", "2025-03-09T21:00:00.000Z"),
+//    Price(5.08, "2025-03-09T21:00:00.000Z", "2025-03-09T22:00:00.000Z"),
+//    Price(3.45, "2025-03-09T22:00:00.000Z", "2025-03-09T23:00:00.000Z"),
+//    Price(4.85, "2025-03-09T23:00:00.000Z", "2025-03-10T00:00:00.000Z"),
+//    Price(15.74, "2025-03-10T00:00:00.000Z", "2025-03-10T01:00:00.000Z"),
+//    Price(-9.45, "2025-03-10T01:00:00.000Z", "2025-03-10T02:00:00.000Z"),
+//    Price(7.32, "2025-03-10T02:00:00.000Z", "2025-03-10T03:00:00.000Z"),
+//    Price(-12.89, "2025-03-10T03:00:00.000Z", "2025-03-10T04:00:00.000Z"),
+//    Price(3.17, "2025-03-10T04:00:00.000Z", "2025-03-10T05:00:00.000Z"),
+//    Price(0.54, "2025-03-10T05:00:00.000Z", "2025-03-10T06:00:00.000Z"),
+//    Price(-20.58, "2025-03-10T06:00:00.000Z", "2025-03-10T07:00:00.000Z"),
+//    Price(9.11, "2025-03-10T07:00:00.000Z", "2025-03-10T08:00:00.000Z"),
+//    Price(-15.33, "2025-03-10T08:00:00.000Z", "2025-03-10T09:00:00.000Z"),
+//    Price(6.78, "2025-03-10T09:00:00.000Z", "2025-03-10T10:00:00.000Z"),
+//    Price(-8.92, "2025-03-10T10:00:00.000Z", "2025-03-10T11:00:00.000Z"),
+//    Price(0.05, "2025-03-10T11:00:00.000Z", "2025-03-10T12:00:00.000Z"),
+//    Price(10.75, "2025-03-10T12:00:00.000Z", "2025-03-10T13:00:00.000Z"),
+//    Price(-18.58, "2025-03-10T13:00:00.000Z", "2025-03-10T14:00:00.000Z"),
+//    Price(14.76, "2025-03-10T14:00:00.000Z", "2025-03-10T15:00:00.000Z"),
+//    Price(-5.23, "2025-03-10T15:00:00.000Z", "2025-03-10T16:00:00.000Z"),
+//    Price(25.10, "2025-03-10T16:00:00.000Z", "2025-03-10T17:00:00.000Z"),
+//    Price(-30.11, "2025-03-10T17:00:00.000Z", "2025-03-10T18:00:00.000Z"),
+//    Price(20.54, "2025-03-10T18:00:00.000Z", "2025-03-10T19:00:00.000Z"),
+//    Price(-24.76, "2025-03-10T19:00:00.000Z", "2025-03-10T20:00:00.000Z"),
+//    Price(0.00, "2025-03-10T20:00:00.000Z", "2025-03-10T21:00:00.000Z"),
+//    Price(17.32, "2025-03-10T21:00:00.000Z", "2025-03-10T22:00:00.000Z"),
+//    Price(-14.27, "2025-03-10T22:00:00.000Z", "2025-03-10T23:00:00.000Z")
+//)
 
 class MainActivity : ComponentActivity() {
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Force portrait mode
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
 
@@ -310,14 +327,16 @@ fun TopBar(
         "page4" -> stringResource(R.string.title_user_page)
         else -> stringResource(R.string.app_name)
     }
+    // Create a unique key that changes when the URI changes
+    val imageKey = rememberUpdatedState(imageUri?.toString() ?: "")
 
-    // Unique key that changes whenever imageUri changes - using URI string + timestamp
-    val imageKey = remember { mutableStateOf(System.currentTimeMillis()) }
-
-    // Update the key whenever imageUri changes
-    LaunchedEffect(imageUri) {
-        imageKey.value = System.currentTimeMillis()
-    }
+//    // Unique key that changes whenever imageUri changes - using URI string + timestamp
+//    val imageKey = remember { mutableStateOf(System.currentTimeMillis()) }
+//
+//    // Update the key whenever imageUri changes
+//    LaunchedEffect(imageUri) {
+//        imageKey.value = System.currentTimeMillis()
+//    }
 
 //    val userName = sharedPreferences.getString("user_name", "") ?: ""
 //    val imageUriString = sharedPreferences.getString("image_uri", null)
@@ -344,16 +363,14 @@ fun TopBar(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .padding(0.dp, 0.dp, 16.dp, 0.dp)
-                        //.background(MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.2f))
                 ) {
                     if (imageUri != null) {
-                        // Force bitmap to reload using the dynamic key
-                        val bitmap = remember(imageUri, imageKey.value) {
+                        // Use key parameter to force recomposition when URI changes
+                        val bitmap = remember(imageUri.toString()) {
                             try {
-                                // Clear any cached data for this URI
-                                context.contentResolver.notifyChange(imageUri, null)
                                 MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
                             } catch (e: Exception) {
+                                Log.e("TopBar", "Error loading bitmap: ${e.message}")
                                 null
                             }
                         }
@@ -364,10 +381,9 @@ fun TopBar(
                                 bitmap = bitmap.asImageBitmap(),
                                 contentDescription = "User Profile",
                                 modifier = Modifier
-                                    .size(24.dp)
-                                    //.size(if (userName.length > 6) 12.dp else 24.dp)
+                                    .size(30.dp)
                                     .clip(CircleShape)
-                                    .rotate(90f + imageRotation.toFloat()) // Apply custom rotation
+                                    .rotate(90f + imageRotation.toFloat())
                                     .align(Alignment.CenterHorizontally),
                                 contentScale = ContentScale.Crop
                             )
@@ -379,8 +395,8 @@ fun TopBar(
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)
-                                    .size(24.dp)
-                                    //.size(if (userName.length > 6) 12.dp else 24.dp)
+                                    .size(30.dp)
+                                //.size(if (userName.length > 6) 12.dp else 24.dp)
                             )
                         }
                     } else if (userName.isNotEmpty()) {
@@ -391,8 +407,8 @@ fun TopBar(
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
-                                .size(24.dp)
-                                //.size(if (userName.length > 6) 12.dp else 24.dp)
+                                .size(30.dp)
+                            //.size(if (userName.length > 6) 12.dp else 24.dp)
                         )
                     }
 
@@ -400,7 +416,7 @@ fun TopBar(
                     if (userName.isNotEmpty()) {
                         Text(
                             text = userName,
-                            fontSize = if (userName.length > 8) 6.sp else 12.sp,
+                            fontSize = if (userName.length > 8) 8.sp else 12.sp,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -1363,6 +1379,9 @@ fun Page4(
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
+    // State to toggle camera screen visibility
+    var showCamera by remember { mutableStateOf(false) }
+    var lensFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_BACK) }
 
     val cameraPermissionGranted = remember {
         mutableStateOf(
@@ -1374,24 +1393,34 @@ fun Page4(
     }
     //var recomposeTrigger by remember { mutableStateOf(false) }
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            tempCameraUri?.let { uri ->
-                //imageUri = uri  // Only set imageUri on success
-                //sharedPreferences.edit().putString("image_uri", uri.toString()).apply()
-                onImageUriChange(uri)  // Update shared state
-            }
-        }
-        // Clear temp URI whether successful or not
-        tempCameraUri = null
-    }
+//    val cameraLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.TakePicture()
+//    ) { success ->
+//        if (success) {
+//            tempCameraUri?.let { uri ->
+//                //imageUri = uri  // Only set imageUri on success
+//                //sharedPreferences.edit().putString("image_uri", uri.toString()).apply()
+//                onImageUriChange(uri)  // Update shared state
+//            }
+//        }
+//        // Clear temp URI whether successful or not
+//        tempCameraUri = null
+//    }
+
+//    val permissionLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.RequestPermission()
+//    ) { isGranted ->
+//        cameraPermissionGranted.value = isGranted
+//    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         cameraPermissionGranted.value = isGranted
+        if (isGranted && showCamera) {
+            // If permission was just granted and camera was requested, show it
+            showCamera = true
+        }
     }
 
     LaunchedEffect(userName) {
@@ -1414,175 +1443,376 @@ fun Page4(
 //        }
 //    }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            Spacer(modifier = Modifier.padding(5.dp))
-            if (userName.isNotEmpty()) {
-                Text(
-                    text = stringResource(R.string.not, userName),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Button(onClick = {
-                    onUserNameChange("")
-                }) {
-                    Text(stringResource(R.string.delete_user_name))
+    if (showCamera) {
+        CameraScreen(
+            onImageCaptured = { uri ->
+                onImageUriChange(uri)
+                // Set 180 degree rotation for front camera images
+                if (lensFacing == CameraSelector.LENS_FACING_FRONT) {
+                    onImageRotationChange(180)
+                } else {
+                    onImageRotationChange(0)  // Reset rotation for back camera
                 }
-                Spacer(modifier = Modifier.padding(20.dp))
-//                Text(
-//                    text = stringResource(R.string.or_change_the_user_name),
-//                    fontSize = 24.sp,
-//                    modifier = Modifier.padding(16.dp)
-//                )
-//                TextField(
-//                    value = localUserName,
-//                    onValueChange = { newValue ->
-//                        if (newValue.length <= 16) {
-//                            localUserName = newValue
-//                            errorMessage = ""
-//                        } else {
-//                            errorMessage = "Username cannot exceed 16 characters"
-//                        }
-//                    },
-//                    label = { Text(stringResource(R.string.name)) }
-//                )
-//                if (errorMessage.isNotEmpty()) {
-//                    Text(
-//                        text = errorMessage,
-//                        color = Color.Red,
-//                        modifier = Modifier.padding(8.dp)
-//                    )
-//                }
-            } else {
-                Text(
-                    text = stringResource(R.string.who_s_using_this_app),
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(16.dp)
-                )
-                val keyboardController = LocalSoftwareKeyboardController.current
-                OutlinedTextField(
-                    value = localUserName,
-                    onValueChange = { newValue ->
-                        val filteredValue = newValue.replace("\n", "")
-                        if (filteredValue.length <= 10) {
-                            localUserName = filteredValue
-                            errorMessage = ""
-                        } else {
-                            errorMessage = ""
-                            //errorMessage = "Username cannot exceed 10 characters"
-                        }
-                    },
-                    label = { Text(stringResource(R.string.textfield_label_name_2)) },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                        }
-                    )
-                )
-                if (errorMessage.isNotEmpty()) {
+                showCamera = false
+            },
+            onError = { exception ->
+                Log.e("CameraX", "Photo capture failed: ${exception.message}", exception)
+                showCamera = false
+            },
+            onCancel = {
+                showCamera = false  // Close camera view when canceled
+            },
+            onCameraChange = { newLensFacing ->
+                lensFacing = newLensFacing
+            }
+        )
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Spacer(modifier = Modifier.padding(5.dp))
+                if (userName.isNotEmpty()) {
                     Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        modifier = Modifier.padding(8.dp)
+                        text = stringResource(R.string.not, userName),
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(16.dp)
                     )
+                    Button(onClick = {
+                        onUserNameChange("")
+                    }) {
+                        Text(stringResource(R.string.delete_user_name))
+                    }
+                    Spacer(modifier = Modifier.padding(20.dp))
+                } else {
+                    Text(
+                        text = stringResource(R.string.who_s_using_this_app),
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    val keyboardController = LocalSoftwareKeyboardController.current
+                    OutlinedTextField(
+                        value = localUserName,
+                        onValueChange = { newValue ->
+                            val filteredValue = newValue.replace("\n", "")
+                            if (filteredValue.length <= 10) {
+                                localUserName = filteredValue
+                                errorMessage = ""
+                            } else {
+                                errorMessage = "Username cannot exceed 10 characters"
+                            }
+                        },
+                        label = { Text(stringResource(R.string.textfield_label_name_2)) },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                            }
+                        )
+                    )
+//                    if (errorMessage.isNotEmpty()) {
+//                        Text(
+//                            text = errorMessage,
+//                            color = Color.Red,
+//                            modifier = Modifier.padding(8.dp)
+//                        )
+//                    }
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    Button(onClick = {
+                        if (localUserName.length <= 16) {
+                            onUserNameChange(localUserName)
+                            localUserName = ""
+                        }
+                    }) {
+                        Text(stringResource(R.string.save_button))
+                    }
                 }
-                Spacer(modifier = Modifier.padding(8.dp))
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
-                    if (localUserName.length <= 16) {
-                        onUserNameChange(localUserName)
-                        localUserName = "" // Clear the input field
+                    if (cameraPermissionGranted.value) {
+                        showCamera = true
+                    } else {
+                        permissionLauncher.launch(Manifest.permission.CAMERA)
                     }
                 }) {
-                    Text(stringResource(R.string.save_button))
+                    Text(stringResource(R.string.take_pic_button))
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Display current image
+            item {
+                Box(
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+                ) {
+                    imageUri?.let { uri ->
+                        val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .rotate(90f + imageRotation.toFloat()),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
-        }
 
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                //imageUri = null  // Reset imageUri to prevent flashing the old image
-                // Create a unique filename with timestamp
-                val timestamp = System.currentTimeMillis()
-                val photoFile = File(context.filesDir, "photo_${timestamp}.jpg")
-                val photoUri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.provider",
-                    photoFile
-                )
-                tempCameraUri = photoUri  // Store URI temporarily
-                cameraLauncher.launch(photoUri)
-            }) {
-                Text(stringResource(R.string.take_pic_button))
+            // Image rotation button
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    val newRotation = (imageRotation + 90) % 360
+                    onImageRotationChange(newRotation)
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Rotate Image",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(stringResource(R.string.rotate_image))
+                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
 
-        // Display current image
-        item {
-            Box(
-                modifier = Modifier
-                    .size(150.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    onImageUriChange(null)
+                }) {
+                    Text(stringResource(R.string.delete_pic_button))
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun CameraScreen(
+    onImageCaptured: (Uri) -> Unit,
+    onError: (ImageCaptureException) -> Unit,
+    onCancel: () -> Unit,
+    onCameraChange: (Int) -> Unit = {}
+) {
+    val context = LocalContext.current
+    var lensFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_BACK) }
+    var flashMode by remember { mutableStateOf(ImageCapture.FLASH_MODE_OFF) }
+    var hasFlash by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Notify parent about the initial camera facing immediately when composed
+    // Needed to update the pic orientation to default
+    LaunchedEffect(Unit) {
+        onCameraChange(lensFacing)
+    }
+
+    val preview = Preview.Builder().build()
+    val previewView = remember { PreviewView(context) }
+    val imageCapture = remember(lensFacing, flashMode) {
+        ImageCapture.Builder()
+            .setTargetRotation(
+                if (lensFacing == CameraSelector.LENS_FACING_FRONT)
+                    Surface.ROTATION_180 else Surface.ROTATION_0
+            )
+            .setFlashMode(flashMode)
+            .build()
+    }
+
+    val cameraSelector = CameraSelector.Builder()
+        .requireLensFacing(lensFacing)
+        .build()
+
+    // Properly clean up camera when leaving the composition
+    DisposableEffect(Unit) {
+        onDispose {
+            val cameraProvider = ProcessCameraProvider.getInstance(context).get()
+            cameraProvider.unbindAll()
+        }
+    }
+
+    // Set up camera with lifecycle
+    LaunchedEffect(lensFacing, flashMode) {
+        val cameraProvider = ProcessCameraProvider.getInstance(context).get()
+        cameraProvider.unbindAll()
+
+        // Check if current camera supports flash
+        val camera = cameraProvider.bindToLifecycle(
+            lifecycleOwner,
+            cameraSelector,
+            preview,
+            imageCapture
+        )
+
+        // Update hasFlash state based on camera capabilities
+        hasFlash = camera.cameraInfo.hasFlashUnit()
+
+        preview.setSurfaceProvider(previewView.surfaceProvider)
+    }
+
+    Box(Modifier.fillMaxSize()) {
+        AndroidView(
+            { previewView },
+            Modifier.fillMaxSize()
+        )
+
+        // Settings and cancel buttons at the top
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+
+            // Cancel button
+            Button(
+                onClick = {
+                    val cameraProvider = ProcessCameraProvider.getInstance(context).get()
+                    cameraProvider.unbindAll()
+                    onCancel()
+                },
+//                modifier = Modifier.size(50.dp),
+                shape = CircleShape
             ) {
-                imageUri?.let { uri ->
-                    val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-                    Image(
-                        bitmap = bitmap.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .rotate(90f + imageRotation.toFloat()), // Apply custom rotation
-                        contentScale = ContentScale.Crop
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Cancel"
+                )
+            }
+
+            // Camera flip button
+            Button(onClick = {
+                lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
+                    CameraSelector.LENS_FACING_FRONT
+                } else {
+                    CameraSelector.LENS_FACING_BACK
+                }
+                onCameraChange(lensFacing)  // Add this line to notify parent
+            },
+//                modifier = Modifier.size(50.dp),
+                shape = CircleShape
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.rounded_cameraswitch_24),
+                    contentDescription = "Flip Camera"
+                )
+            }
+
+            // Flash toggle button - only show if flash is available
+            if (hasFlash) {
+                Button(onClick = {
+                    flashMode = when (flashMode) {
+                        ImageCapture.FLASH_MODE_OFF -> ImageCapture.FLASH_MODE_ON
+                        ImageCapture.FLASH_MODE_ON -> ImageCapture.FLASH_MODE_AUTO
+                        else -> ImageCapture.FLASH_MODE_OFF
+                    }
+                },
+//                    modifier = Modifier.size(50.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            id = when (flashMode) {
+                                ImageCapture.FLASH_MODE_ON -> R.drawable.rounded_flash_on_24
+                                ImageCapture.FLASH_MODE_AUTO -> R.drawable.rounded_flash_auto_24
+                                else -> R.drawable.rounded_flash_off_24
+                            }
+                        ),
+                        contentDescription = when (flashMode) {
+                            ImageCapture.FLASH_MODE_ON -> "Flash On"
+                            ImageCapture.FLASH_MODE_AUTO -> "Flash Auto"
+                            else -> "Flash Off"
+                        }
                     )
                 }
             }
+
         }
 
-//        item {
-//            Spacer(modifier = Modifier.height(16.dp))
-//            Button(onClick = {
-//                recomposeTrigger = !recomposeTrigger
-//            }) {
-//                Text(stringResource(R.string.update_pic_button))
-//            }
-//        }
+        // Other buttons at the bottom
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
 
-        // Pic rotation button
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                // Add 90 degrees to current rotation and normalize to 0-359
-                val newRotation = (imageRotation + 90) % 360
-                onImageRotationChange(newRotation)
-            }) {
+            // Take photo button
+            Button(
+                onClick = {
+                    captureImage(
+                        context,
+                        imageCapture,
+                        onImageCaptured,
+                        onError,
+                        lensFacing == CameraSelector.LENS_FACING_FRONT
+                    )
+                },
+//                modifier = Modifier.size(50.dp),
+                shape = CircleShape
+            ) {
                 Icon(
-                    imageVector = Icons.Default.Refresh, // Using built-in Material icon
-                    contentDescription = "Rotate Image",
-                    modifier = Modifier.padding(end = 8.dp)
+                    painter = painterResource(id = R.drawable.rounded_camera_36),
+                    contentDescription = "Take Photo"
                 )
-                Text(stringResource(R.string.rotate_image))
             }
-        }
 
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-//                imageUri = null
-//                sharedPreferences.edit().remove("image_uri").apply()
-                onImageUriChange(null)  // Clear image through callback
-            }) {
-                Text(stringResource(R.string.delete_pic_button))
-            }
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
+
+private fun captureImage(
+    context: Context,
+    imageCapture: ImageCapture,
+    onImageCaptured: (Uri) -> Unit,
+    onError: (ImageCaptureException) -> Unit,
+    isFrontCamera: Boolean
+) {
+    val timestamp = System.currentTimeMillis()
+    val photoFile = File(context.filesDir, "photo_${timestamp}.jpg")
+    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+    imageCapture.takePicture(
+        outputOptions,
+        ContextCompat.getMainExecutor(context),
+        object : ImageCapture.OnImageSavedCallback {
+            override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
+
+                try {
+                    // Make sure camera is released after capturing image
+                    val cameraProvider = ProcessCameraProvider.getInstance(context).get()
+                    cameraProvider.unbindAll()
+                } catch (e: Exception) {
+                    Log.e("CameraX", "Error unbinding camera: ${e.message}", e)
+                }
+
+                onImageCaptured(savedUri)
+            }
+
+            override fun onError(exception: ImageCaptureException) {
+                // Make sure camera is released even on error
+                try {
+                    val cameraProvider = ProcessCameraProvider.getInstance(context).get()
+                    cameraProvider.unbindAll()
+                } catch (e: Exception) {
+                    Log.e("CameraX", "Error unbinding camera: ${e.message}", e)
+                }
+
+                onError(exception)
+            }
+        }
+    )
 }

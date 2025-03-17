@@ -9,7 +9,7 @@
     <string name="counter_nav_button">Calculate</string>
     <string name="data_nav_button">Data</string>
     <string name="home_title">Latest Price Data</string>
-    <string name="calculator_page_title">Calculate Electricity Cost</string>
+    <string name="calculator_page_title">Calculate Costs</string>
     <string name="user_nav_button">User</string>
     <string name="icon_home">Home</string>
     <string name="icon_calculate">Calculate</string>
